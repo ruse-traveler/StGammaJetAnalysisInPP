@@ -1,0 +1,22 @@
+#include "GammaJetTowerEnergyToTLorentzVector.h"
+
+//Contains the Member Functions for the TRACK Class
+
+ClassImp(GammaJetTowerEnergyToTLorentzVector);
+
+//_____________________________________________________________________
+TLorentzVector GammaJetTowerEnergyToTLorentzVector::operator(const TLorentzVector& TwrVect, const TVector3& Vertx, double BEMC_R)
+{
+
+  TVector3 towerLocation;
+  towerLocation = TwrVect;
+
+  TVector3 VertexLocation;
+  VertexLocation = Vertx;
+
+  TVector3 momentum = towerLocation - VertexLocation;
+  
+  
+
+
+}

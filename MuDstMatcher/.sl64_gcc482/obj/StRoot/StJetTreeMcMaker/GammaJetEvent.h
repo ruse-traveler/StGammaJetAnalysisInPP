@@ -1,0 +1,1 @@
+../../../../StRoot/StJetTreeMcMaker/GammaJetEvent.h

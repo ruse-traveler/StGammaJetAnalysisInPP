@@ -1,0 +1,22 @@
+#ifndef STAR_StJetTreeMcMaker
+#define STAR_StJetTreeMcMaker
+
+//#include "fastjet/ClusterSequenceArea.hh"
+#include "fastjet/config.h"
+#include "fastjet/PseudoJet.hh"
+#include "fastjet/ClusterSequence.hh"
+#include "fastjet/ClusterSequenceArea.hh"
+#include "fastjet/Selector.hh"
+#include "fastjet/tools/Subtractor.hh"
+#include "fastjet/tools/JetMedianBackgroundEstimator.hh"
+
+
+void RunFastJet(vector<PseudoJet> particles)
+{
+
+}
+
+
+
+//__________
+#endif 
