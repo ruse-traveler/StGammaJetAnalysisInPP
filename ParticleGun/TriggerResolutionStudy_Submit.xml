@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<job nProcesses="10" maxFilesPerProcess="1" fileListSyntax="paths" filesPerHour="1" simulateSubmission="false" copyInputLocally="false">
+    <command>
+
+        @ seed = &random; + $JOBINDEX
+
+        starver SL20a
+        root4star -l -b -q TriggerResolutionStudy_RunStarsim.C\(&nevents;,$seed,\"errorTest1_resolved_$JOBID\"\) &gt;&amp; sched_${JOBID}.sim.log
+
+        set fzdfile =  kinematics_errorTest1_resolved_${JOBID}.starsim.fzd
+
+        starver SL11d_embed
+        root4star -l -b -q TriggerResolutionStudy_RunBfc.C\(&nevents;,\"$fzdfile\"\)  &gt;&amp; sched_${JOBID}.bfc.log
+
+    </command>
+    <stdout URL="file:&submitdir;/&submitoutdir;/&prodId;/sched_$JOBID.out" />
+    <stderr URL="file:&submitdir;/&submitoutdir;/&prodId;/sched_$JOBID.err" />
+    <output fromScratch="*.starsim.root"            toURL="file:&submitdir;/&simoutdir;/&prodId;/" />
+    <output fromScratch="*.starsim.fzd"             toURL="file:&submitdir;/&simoutdir;/&prodId;/" />
+    <output fromScratch="*.*.root"                  toURL="file:&submitdir;/&recooutdir;/&prodId;/" />
+    <output fromScratch="sched_$JOBID.*.log"         toURL="file:&submitdir;/&submitoutdir;/&prodId;/"/>
+
+    <SandBox>
+        <Package>
+            <File>file:/star/data01/pwg/dmawxc/Embedding/ParticleGun/StRoot</File>
+            <File>file:/star/data01/pwg/dmawxc/Embedding/ParticleGun/.sl73_gcc485</File>
+            <File>file:/star/data01/pwg/dmawxc/Embedding/ParticleGun/TriggerResolutionStudy_RunStarsim.C</File>
+            <File>file:/star/data01/pwg/dmawxc/Embedding/ParticleGun/TriggerResolutionStudy_RunBfc.C</File>
+        </Package>
+    </SandBox>
+
+    <Generator>
+        <Location>/star/data01/pwg/dmawxc/Embedding/ParticleGun/</Location>
+    </Generator>
+</job>

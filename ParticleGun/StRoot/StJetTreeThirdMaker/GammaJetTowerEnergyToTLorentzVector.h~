@@ -1,0 +1,31 @@
+#ifndef GammaJetTowerToTLorentzVector_H
+#define GammaJetTowerToTLorentzVector_H
+
+//Contains the GammaJetTower Class Declaration
+//It converts Tower energy to TLorentzVector
+// Nihar Sahoo  .... Jun 20, 2016
+
+#include <stdlib.h>
+#include <TROOT.h>
+#include "Riostream.h"
+#include <TObject.h>
+
+#include <TLorentzVector.h>
+#include <TVector3.h>
+
+
+class GammaJetTowerEnergyToTLorentzVector:public TObject{
+
+ private:
+  double mass_;
+
+public:
+GammaJetTowerEnergyToTLorentzVector(double mass = 0 /* photon mass as default */)
+: mass_(mass) { }
+
+  TLorentzVector operator()(const TLorentzVector& TwrVect, const TVector3& Vertx );
+
+ClassDef(GammaJetTowerEnergyToTLorentzVector, 1)
+};
+
+#endif
