@@ -1,0 +1,1 @@
+htar -cf /home/dmawxc/pp200run9_2017Apr3/pp200r9.debug.d21m4y2017.tar /star/u/dmawxc/JetRecon_pp/FullJetTree/debug/*.list >& /star/u/dmawxc/JetRecon_pp/FullJetTree/debug/logs/hpss.debug.d13m4y2017.log &

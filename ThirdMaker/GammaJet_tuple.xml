@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<job maxFilesPerProcess="1" simulateSubmission="false" fileListSyntax="paths">
+	<command>
+
+	  cd /star/u/dmawxc/JetRecon_pp/FullJetTree/submit
+          starver SL14g
+	  root4star -b -q doEvents.C\(20000000,\"/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/test_tuple.$JOBID.root\",\"$FILELIST\"\)
+        </command>
+
+
+	<stdout URL="file:/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/tuple.$JOBID.out"/>
+	<stderr URL="file:/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/tuple.$JOBID.err"/>
+
+        <Generator>
+          <ScriptLocation>./</ScriptLocation>
+          <ListLocation>./</ListLocation>
+        </Generator>
+
+	<!--> <input URL="filelist:/star/u/dmawxc/JetRecon_pp/FullJetTreeTest/submit/input/files.r10112099-10112111.d14m3y2017.list" /> <-->
+        <!--> <input URL="filelist:/star/u/dmawxc/JetRecon_pp/FullJetTreeTest/submit/input/files.r10123010-10124072.d17m3y2017.list" /> <-->
+        <!--> <input URL="catalog:star.bnl.gov?trgsetupname=production2009_200Gev_Hi||production2009_200Gev_Hi||production2009_200Gev_noendcap||production2009_200Gev_Single||tof_production2009_single,runnumber=10145070,production=P11id,filetype=daq_reco_MuDst,filename~st_gamma,storage!=HPSS" nFiles="all" singleCopy="true" /> <-->
+        <input URL="catalog:star.bnl.gov?trgsetupname=production2009_200Gev_Hi||production2009_200Gev_Hi||production2009_200Gev_noendcap||production2009_200Gev_Single||tof_production2009_single,runnumber[]10124013-10124053,production=P11id,filetype=daq_reco_MuDst,filename~st_gamma,storage!=HPSS" nFiles="all" singleCopy="true" />
+</job>

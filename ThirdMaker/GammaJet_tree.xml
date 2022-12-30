@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- ATTENTION   !!!!! Always set maxFilesPerProcess="1" for StThirdJetMaker to avoid Mismatch between trigger and tracks -->
+<job maxFilesPerProcess="1" simulateSubmission="false" fileListSyntax="paths">
+	<command>
+
+	  cd /star/u/dmawxc/JetRecon_pp/FullJetTree/submit/
+	  starver SL14g
+	  root4star -b -q doFullJetTree.C\(20000000,\"/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/test_tree0.$JOBID.root\",\"$FILELIST\"\)
+        </command>
+
+
+	<stdout URL="file:/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/tree0.$JOBID.out"/>
+	<stderr URL="file:/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/test/tree0.$JOBID.err"/>
+
+        <Generator>
+          <ScriptLocation>./</ScriptLocation>
+          <ListLocation>./</ListLocation>
+        </Generator>
+
+
+<input URL="catalog:star.bnl.gov?trgsetupname=production2009_200Gev_Hi||production2009_200Gev_Hi||production2009_200Gev_noendcap||production2009_200Gev_Single||tof_production2009_single,runnumber[]10110061-10124111,production=P11id,filetype=daq_reco_MuDst,filename~st_gamma,storage!=HPSS" nFiles="all" singleCopy="true" />
+
+
+<!--
+
+Grounp 0
+: 10110061-10124111
+Grounp 1
+: 10124113-10138087
+Grounp 2
+: 10138088-10152001
+Grounp 3
+: 10152004-10167054
+Grounp 4
+: 10167056-10180030
+Grounp 5
+: 10180034-10181005
+
+-->
+
+</job>
+
+
+
