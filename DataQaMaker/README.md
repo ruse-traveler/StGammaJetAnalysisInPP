@@ -4,7 +4,7 @@ This reads in the output of the Third Maker, reconstructs jets from TPC tracks, 
 
 ---
 
-Compile by running `cons.sh` (located in `./scripts`) in any STAR version. Input/output files and jet finding parameters are set in `MakeDataQaPlots.C`. The class can be easily run with `MakeDataQaPlots.sh`
+Compile by running `cons.sh` in any STAR version. Input/output files and jet finding parameters are set in `MakeDataQaPlots.C`. The class can be easily run with `MakeDataQaPlots.sh`
 
 ```
 ./cons.sh
