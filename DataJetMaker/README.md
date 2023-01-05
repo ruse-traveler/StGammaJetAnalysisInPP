@@ -4,9 +4,9 @@ This reads in the output of the Third Maker, reconstructs jets from TPC tracks, 
 
 ---
 
-Compile by running cons.sh (located in `scripts/`) in any STAR version. Input/output files and jet finding parameters are set in `MakeJetTree.C`. The class can be run easily with `MakeJetTree.sh`
+Compile by running cons.sh (located in `scripts/`) in any STAR version. Input/output files and jet finding parameters are set in `MakeJetTree.C`. The class can be run easily with `MakeJetTree.sh`. The macro `ReadJetTree.C` reads in the output of `MakeJetTree.C` and produces several histograms of jet quantities.
 
 ```
 ./cons.sh
 ./MakeJetTree.sh
-``
+```
