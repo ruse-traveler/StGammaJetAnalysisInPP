@@ -1,15 +1,10 @@
-<script
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-  type="text/javascript">
-</script>
-
 # StGammaJetAnalysisInPP
 
-This repository compiles the major pieces of code from the STAR $pp$ $\gamma$+jet analysis. Each module is detailed below, where the order of the list corresponds to the overall flow of the analysis.
+This repository compiles the major pieces of code from the STAR $p+p$ $\gamma$+jet analysis. Each module is detailed below, where the order of the list corresponds to the overall flow of the analysis.
 
-  1. **Third Maker:** Reads in STAR $pp$ data in the form of MuDSTs, and constructs compact ROOT trees (referred to internally as femtoDSTs) containing $pp$ collisions tagged by potential energetic $pi^{0}$ and direct photons.
-  2. **Data QA Maker:**
-  3. **Data Jet Maker:**
+  1. **Third Maker:** This reads in STAR $p+p$ data in the form of MuDSTs, and constructs compact ROOT trees (referred to internally as femtoDSTs) containing $p+p$ collisions tagged by potential energetic $\pi^{0}$ or direct photons based on the [algorithm](https://doi.org/10.1103/PhysRevC.82.034909) developed by Ahmed Hamed and Saskia Mioduszewski.
+  2. **Data Jet Maker:** This reads in femtoDSTs of $p+p$ data, reconstructs jets from TPC tracks, and saves them to a compact ROOT tree.
+  3. **Data QA Maker:** This also reads in femtoDSTs of $p+p$ data, reconstructs jets from TPC tracks, and produces several QA plots of event-, trigger-, track-, and jet-level quantities.
   4. **MuDst Matcher:**
   5. **Embed Jet Maker:**
     - **StGeantJetTreeMaker:**
