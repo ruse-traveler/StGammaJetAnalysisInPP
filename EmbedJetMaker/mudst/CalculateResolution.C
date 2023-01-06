@@ -81,10 +81,10 @@ void CalculateResolution() {
   UInt_t err(0);
   switch (maker) {
     case 0:
-      gROOT -> ProcessLine(".L CalculateDataEfficiency.C");
+      gROOT -> ProcessLine(".L macros/CalculateDataEfficiency.C");
       break;
     case 1:
-      gROOT -> ProcessLine(".L CalculateEmbeddingEfficiency.C");
+      gROOT -> ProcessLine(".L macros/CalculateEmbeddingEfficiency.C");
       break;
     default:
       cerr << "PANIC: check the value of 'maker.' It should be 0 or 1..." << endl;
