@@ -26,4 +26,3 @@ The various Jet Maker modules make use of the [FastJet library](http://fastjet.f
   - [minor] Update driver macro in MuDstMatcher to work with corresponding class.
   - [minor] Add the following packages
     - Pythia8 Generator
-  - [major] Add documentation to sub-directories
