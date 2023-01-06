@@ -10,5 +10,5 @@ Compile using `cons.sh` (located in `./scripts`) in any STAR version. Input/outp
 
 ```
 ./cons.sh
-./MakeFemtoDst.sh <particle, detector> <charged, full>
+./MakeFemtoDst.sh {particle, detector} {charged, full}
 ``` 

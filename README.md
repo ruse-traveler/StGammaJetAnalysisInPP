@@ -18,7 +18,7 @@ This repository compiles the major pieces of code from the STAR $p+p$ $\gamma$+j
   10. **Particle Gun:** This module uses starsim to simulate single $\pi^{0}$ and $\gamma$, pass them through a GEANT-3 simulation of STAR, and reconstruct the output using the Third Maker.
   11. **Trigger Energy Scale Calculator:** This takes the output of the Particle Gun and matches the reconstructed $\pi^{0}$ and $\gamma$ to their simulated counterparts, providing a measure of the energy scale and resolution of our measured triggers.
   12. **Trigger Weight Calculator:** This takes the output of the Trigger Energy Scale Calculator and computes a set of weights which emulate the effect of the trigger energy scale/resolution to be applied to the simulated jet spectra compared against the unfolded data.
-  13. **Star Pythia Jet Maker:** This reconstructs jets from charged particles in $\pi^{0}$- and $\gamma$-triggered events simulated by PYTHIA-6 tuned to STAR data. The output of this module was compared against the unfolded data.
+  13. **STAR Pythia Jet Maker:** This reconstructs jets from charged particles in $\pi^{0}$- and $\gamma$-triggered events simulated by PYTHIA-6 tuned to STAR data. The output of this module was compared against the unfolded data.
 
 The various Jet Maker modules make use of the [FastJet library](http://fastjet.fr) developed by Matteo Cacciari, Gavin Salam, and Gregory Soyez; the Jet Folder modules make use of the [RooUnfold library](https://gitlab.cern.ch/RooUnfold/RooUnfold) developed by Tim Adye; and all modules make use of the [ROOT framework](https://root.cern.ch). Naturally, several modules require the use of [STAR core software](https://github.com/star-bnl).
 
