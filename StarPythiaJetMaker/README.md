@@ -15,7 +15,7 @@ starver SL14g
 ./cons.sh
 ./RunJetInSerial.sh {1,2,3,4}
 ReadJetTreeSimR{02,05}.sh
-DoPtHatSum.C
+root -b -q DoPtHatSum.C
 ```
 
 (Note that the last line is only necessary for the $\pi^{0}$-triggered jets.)
