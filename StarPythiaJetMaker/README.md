@@ -11,6 +11,7 @@ The scripts `RunJetInSerial{02,05}.sh` were set up to run over multiple batches 
 In order to enhance statistics, the $\pi^{0}$-triggered STAR-tuned PYTHIA-6 sample was simulated in bins of partonic pT. Thus, these jets need to be combined into a single spectrum after being reconstructed. Histograms are created for each pT bin using `ReadJetTreeSimR{02,05}.C`: trigger and jet acceptance parameters are set in `ReadJetTreeSimR{02,05}.C`, and input/output files are set in `ReadJetTreeSimR{02,05}.sh`, which are used to run the `*.C` files. After running these macros, the jets are summmed using `DoPtHatSum.C`.
 
 ```
+starver SL14g
 ./cons.sh
 ./RunJetInSerial.sh {1,2,3,4}
 ReadJetTreeSimR{02,05}.sh
