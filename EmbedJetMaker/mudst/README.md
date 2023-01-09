@@ -25,3 +25,9 @@ The macro `CalculateResolution.C` uses the output of the MuDST Matcher to calcul
 root -b -q FinalizeEfficiency.C
 root -b -q CalculateResolution.C
 ```
+
+The input for this module (output from the MuDST Matcher)  may be found on RCF at the following path:
+
+```
+/star/data01/pwg/dmawxc/Embedding/Run9pp/MuDstMatching/output/merged/*.root
+```

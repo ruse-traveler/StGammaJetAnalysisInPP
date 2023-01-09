@@ -10,3 +10,9 @@ Compile by running `cons.sh` (located in `./scripts`) in any STAR version. Input
 ./cons.sh
 ./MakeJetTree.sh
 ```
+
+The Third Maker output for the entire pp dataset may be on RCF at the following path:
+
+```
+/star/data01/pwg/dmawxc/JetReco_pp/FullJetTree/merged/pp200r9.merge.root
+```

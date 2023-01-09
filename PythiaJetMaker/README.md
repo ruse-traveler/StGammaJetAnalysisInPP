@@ -11,4 +11,16 @@ Compile using `cons.sh` (located in `./scripts`) in any STAR version. Input/outp
 ```
 ./cons.sh
 ./MakeFemtoDst.sh {particle, detector} {charged, full}
-``` 
+```
+
+There are two sets of input for this module, both of which can be found on RCF. The first is a large sample of $\pi^{0}$- and $\gamma$-triggered PYTHIA-8 events with partonic pT greater than 4 GeV/c, and the second is a sample of $\pi^{0}$-triggered PYTHIA-8 events generated in *bins* of partonic pT. The first was used extensively for testing and for comparison against the unfolded data before the STAR-tuned PYTHIA-6 distributions were available, and the second was used to generate the response matrices and jet-matching efficiencies for assessing the tracking systematic uncertainties.
+
+### > 4 GeV/c Input
+```
+/star/data01/pwg/dmawxc/JetReco_pp/PythiaJetMaker/input/Pythia/*.merged.root
+```
+
+### Binned Input
+```
+/star/data01/pwg/dmawxc/PythiaData/PtHatBins/*.root
+```
