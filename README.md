@@ -23,6 +23,5 @@ This repository compiles the major pieces of code from the STAR $p+p$ $\gamma$+j
 The various Jet Maker modules make use of the [FastJet library](http://fastjet.fr) developed by Matteo Cacciari, Gavin Salam, and Gregory Soyez; the Jet Folder modules make use of the [RooUnfold library](https://gitlab.cern.ch/RooUnfold/RooUnfold) developed by Tim Adye; and all modules make use of the [ROOT framework](https://root.cern.ch). Naturally, several modules require the use of [STAR core software](https://github.com/star-bnl).
 
 ## **TODO:**
-  - [minor] Update driver macro in MuDstMatcher to work with corresponding class.
   - [minor] Add the following packages
     - Pythia8 Generator
