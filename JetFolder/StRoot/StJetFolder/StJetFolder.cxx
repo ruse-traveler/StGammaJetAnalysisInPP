@@ -390,8 +390,14 @@ void StJetFolder::Finish() {
       _fQtSmooth[iPtPar] -> Write();
     }
   }
-  if (_smoothEfficiency) {
+  if (_smoothEfficiency || _fineTuneEfficiency) {
     _fEfficiency -> Write();
+    _fSmoothEff  -> Write();
+    if (_fineTuneEfficiency) {
+      _hResiduals   -> Write();
+      _fResiduals   -> Write();
+      _fFineTuneEff -> Write();
+    }
   }
   if (_applyCutoff) {
     _fCutoff -> Write();

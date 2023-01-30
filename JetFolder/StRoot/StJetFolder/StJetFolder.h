@@ -78,6 +78,7 @@ const UInt_t NRange       = 2;
 const UInt_t NPtPar       = 5;
 const UInt_t NParEff      = 2;
 const UInt_t NParTan      = 2;
+const UInt_t NParPol      = 3;
 const UInt_t NParGaus     = 6;
 const UInt_t NSmoothDef   = 5000000;
 const Bool_t PriSmoothDef = false;
@@ -97,7 +98,7 @@ public:
   void SetSmeared(const Char_t *sFile, const Char_t *sName);
   void SetMeasured(const Char_t *mFile, const Char_t *mName);
   void SetResponse(const Char_t *rFile, const Char_t *rName, const Bool_t doResSmooth);
-  void SetEfficiency(const Char_t *eFile, const Char_t *eName, const Bool_t doEffSmooth, const Bool_t removeErrors);
+  void SetEfficiency(const Char_t *eFile, const Char_t *eName, const Bool_t doEffSmooth, const Bool_t doEffFineTune, const Bool_t removeErrors);
   void SetEventInfo(const Int_t beam, const Double_t energy);
   void SetTriggerInfo(const Int_t trigger, const UInt_t eTtrgIndex, const Double_t hMax);
   void SetJetInfo(const Int_t type, const Int_t nRM, const Double_t rJet, const Double_t aMin, const Double_t pTmin);
@@ -133,6 +134,7 @@ private:
   Bool_t    _smoothResponse;
   Bool_t    _responseSmoothed;
   Bool_t    _smoothEfficiency;
+  Bool_t    _fineTuneEfficiency;
   Bool_t    _removeErrors;
   Bool_t    _smoothPrior;
   Bool_t    _priorSmoothed;
@@ -154,6 +156,9 @@ private:
   Double_t  _uMax;
   Double_t  _bMax;
   // ROOT members
+  TF1       *_fResiduals;
+  TF1       *_fSmoothEff;
+  TF1       *_fFineTuneEff;
   TF1       *_fEfficiency;
   TF1       *_fQtSmooth[NPtPar];
   TF1       *_fSmoothPrior;
@@ -183,6 +188,7 @@ private:
   TH1D      *_hSVvector;
   TH1D      *_hUnfoldErrors;
   TH1D      *_hEfficiency;
+  TH1D      *_hResiduals;
   TH2D      *_hPearson;
   TH2D      *_hResponse;
   TH2D      *_hResponseDiff;

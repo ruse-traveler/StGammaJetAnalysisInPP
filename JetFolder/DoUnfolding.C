@@ -59,12 +59,13 @@ class StJetFolder;
 
 
 // input and output files
-static const TString pFile("input/embed/pp200r9embed.forUnfolding_pTbinHuge.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString sFile("input/embed/pp200r9embed.forUnfolding_pTbinHuge.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString mFile("et911r05rff_cutoffClosure/pp200r9rff.modifiedStatsWithDetCutoff_detLvlRFF_pTbinHuge.et911r05pi0.d3m2y2022.root");
-static const TString eFile("input/embed/pp200r9embed.forUnfolding_pTbinHuge.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString rFile("input/embed/pp200r9embed.forUnfolding_pTbinHuge.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString oFile("pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinHuge.et911r05qt05130");
+static const TString pFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString sFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString mFile("closure/closureTest_modStats_et911r05rff/modifiedStats.detLvlRFF_withBinAndEtaCorr_pTbinFine.et911r05pi0.d9m8y2021.root");
+static const TString eFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString rFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+//static const TString oFile("pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinFine.et911r05qt05130");
+static const TString oFile("pp200r9rff.testingEffFineTune_smoothWithFineTune.et911r05qt05130");
 // input histograms
 static const TString pName("hSumParFF");
 static const TString sName("hSumDetFF");
@@ -82,7 +83,7 @@ static const Int_t K[] = {3};
 static const Int_t    nP  = 1;
 static const Int_t    nN  = 1;
 static const Int_t    nT  = 1;
-static const Int_t    P[] = {1};
+static const Int_t    P[] = {0};
 static const Double_t N[] = {4.6};
 static const Double_t T[] = {0.4};
 
@@ -93,6 +94,7 @@ static const Bool_t  doEffSmooth   = true;     // smooth efficiency
 static const Int_t   doResSmooth   = true;     // smooth response
 static const Bool_t  doPriorSmooth = false;    // smooth prior
 static const Bool_t  doPriorCutoff = false;    // apply a smooth cutoff to prior
+static const Bool_t  doEffFineTune = true;     // fine tune efficiency after smoothing
 static const Bool_t  removeEffErr  = false;    // remove errors on efficiency
 static const UInt_t  eTtrgIndex    = 0;        // eTrg range (controls how prior is smoothed): 0 = 9 - 11, 1 = 11 - 15, 2 = 15 - 20 
 static const UInt_t  trigType      = 2;        // 0 = "gamma-dir", 1 = "gamma-rich", 2 = "pi0", 3 = "h+-" (controls if negative bins are checked for)
@@ -278,7 +280,7 @@ void DoUnfolding() {
             f.SetSmeared(sFile.Data(), sName.Data());
             f.SetMeasured(mFile.Data(), mName.Data());
             f.SetResponse(rFile.Data(), rName.Data(), doResSmooth);
-            f.SetEfficiency(eFile.Data(), eName.Data(), doEffSmooth, removeEffErr);
+            f.SetEfficiency(eFile.Data(), eName.Data(), doEffSmooth, doEffFineTune, removeEffErr);
             // set info and parameters
             f.SetEventInfo(beam, energy);
             f.SetTriggerInfo(trigType, eTtrgIndex, hTrgMax);

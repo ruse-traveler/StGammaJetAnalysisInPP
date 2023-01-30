@@ -123,10 +123,11 @@ void StJetFolder::SetResponse(const Char_t *rFile, const Char_t *rName, const Bo
 }  // end 'SetResponse(Char_t*, Char_t*)'
 
 
-void StJetFolder::SetEfficiency(const Char_t *eFile, const Char_t *eName, const Bool_t doEffSmooth, const Bool_t removeErrors) {
+void StJetFolder::SetEfficiency(const Char_t *eFile, const Char_t *eName, const Bool_t doEffSmooth, const Bool_t doEffFineTune, const Bool_t removeErrors) {
 
-  _smoothEfficiency = doEffSmooth;
-  _removeErrors     = removeErrors;
+  _smoothEfficiency   = doEffSmooth;
+  _fineTuneEfficiency = doEffFineTune;
+  _removeErrors       = removeErrors;
 
   TFile *fEfficiency = (TFile*) gROOT -> GetListOfFiles() -> FindObject(eFile);
   if (!fEfficiency || !fEfficiency->IsOpen()) {
@@ -142,45 +143,90 @@ void StJetFolder::SetEfficiency(const Char_t *eFile, const Char_t *eName, const 
   if (hEfficiency) {
     _hEfficiency = (TH1D*) hEfficiency -> Clone();
     _flag[4]     = true;
-  }
-  else {
+  } else {
     PrintError(4);
     assert(hEfficiency);
   }
 
   // fit parameters
+  const TString sPolName("fResiduals");
   const TString sEffName("fEfficiency");
+  const TString sSmooth("fSmoothEff");
+  const TString sFine("fFineTuneEff");
   const TString sEffFunc("[0] * (1 - TMath::Exp(-1.*[1]*x))");
+  const TString sEffFine("[0] * (1 - TMath::Exp(-1.*[1]*2)) * pol2(2)");
   const TString sEffParNames[NParEff] = {"#epsilon_{0}", "#sigma"};
   const Float_t xEffRange[NRange]     = {0., 100.};
   const Float_t xFitRange[NRange]     = {0.2, 15.};
   const Float_t pEffGuess[NParEff]    = {0.87, 4.};
-  // quick fix [02.04.2022]
-  //const Float_t xEffRange[NRange]     = {0., 100.};
-  //const Float_t xFitRange[NRange]     = {4., 25.};
-  //const Float_t pEffGuess[NParEff]    = {0.85, 0.375};
+  const Float_t pPolGuess[NParPol]    = {1., -1, 0.5};
   const UInt_t  fColEff(2);
+  const UInt_t  fColRes(4);
 
-  // initialize efficiency fit
-  if (_smoothEfficiency) {
-    _fEfficiency = new TF1(sEffName.Data(), sEffFunc.Data(), xEffRange[0], xEffRange[1]);
-    _fEfficiency -> SetParameter(0, pEffGuess[0]);
-    _fEfficiency -> SetParameter(1, pEffGuess[1]);
-    _fEfficiency -> SetParName(0, sEffParNames[0].Data());
-    _fEfficiency -> SetParName(1, sEffParNames[1].Data());
-    _fEfficiency -> SetLineColor(fColEff);
+  // initialize efficiency fits
+  const Bool_t doSmoothing = (_smoothEfficiency || _fineTuneEfficiency);
+  if (doSmoothing) {
+    _fSmoothEff = new TF1(sSmooth.Data(), sEffFunc.Data(), xEffRange[0], xEffRange[1]);
+    _fSmoothEff -> SetParameter(0, pEffGuess[0]);
+    _fSmoothEff -> SetParameter(1, pEffGuess[1]);
+    _fSmoothEff -> SetParName(0, sEffParNames[0].Data());
+    _fSmoothEff -> SetParName(1, sEffParNames[1].Data());
+    _fSmoothEff -> SetLineColor(fColEff);
+    if (_fineTuneEfficiency) {
+      _fResiduals   = new TF1(sPolName.Data(), "pol2(0)",       xEffRange[0], xEffRange[1]);
+      _fFineTuneEff = new TF1(sFine.Data(),    sEffFine.Data(), xEffRange[0], xEffRange[1]);
+      _fResiduals   -> SetParameter(0, pPolGuess[0]);
+      _fResiduals   -> SetParameter(1, pPolGuess[1]);
+      _fResiduals   -> SetParameter(2, pPolGuess[2]);
+      _fFineTuneEff -> SetParameter(0, pEffGuess[0]);
+      _fFineTuneEff -> SetParameter(1, pEffGuess[1]);
+      _fFineTuneEff -> SetParameter(2, pPolGuess[0]);
+      _fFineTuneEff -> SetParameter(3, pPolGuess[1]);
+      _fFineTuneEff -> SetParameter(4, pPolGuess[2]); 
+      _fResiduals   -> SetLineColor(fColRes);
+      _fFineTuneEff -> SetLineColor(fColEff);
+    }
   }
-
-  // quick fix [02.03.2022]
-  //_fEfficiency -> SetParLimits(0, 0.5, 1.);
-  //_fEfficiency -> SetParLimits(1, 0.25, 1.);
 
   // smooth efficiency or remove errors
   if (_smoothEfficiency) {
+
+    // smooth efficiency
     PrintInfo(15);
-    _hEfficiency -> Fit(sEffName.Data(), "", "", xFitRange[0], xFitRange[1]);
-  }
-  else if (_removeErrors) {
+    _hEfficiency -> Fit(sSmooth.Data(), "", "", xFitRange[0], xFitRange[1]);
+
+    // fine tune smoothing
+    if (_fineTuneEfficiency) {
+
+      // divide efficiency by fit
+      _hResiduals = (TH1D*) _hEfficiency -> Clone();
+      _hResiduals -> SetName("hEffResiduals");
+      _hResiduals -> Divide(_fSmoothEff);
+      _hResiduals -> Fit(sPolName.Data(), "", "", xFitRange[0], xFitRange[1]);
+
+      // extract parameters and get fit
+      const Double_t amp  = _fSmoothEff -> GetParameter(0);
+      const Double_t sig  = _fSmoothEff -> GetParameter(1);
+      const Double_t res0 = _fResiduals -> GetParameter(0);
+      const Double_t res1 = _fResiduals -> GetParameter(1);
+      const Double_t res2 = _fResiduals -> GetParameter(2);
+      _fFineTuneEff -> SetParameter(0, amp);
+      _fFineTuneEff -> SetParameter(1, sig);
+      _fFineTuneEff -> SetParameter(2, res0);
+      _fFineTuneEff -> SetParameter(3, res1);
+      _fFineTuneEff -> SetParameter(4, res2);
+      _hEfficiency  -> Fit(sFine.Data(), "", "", xFitRange[0], xFitRange[1]);
+    }
+
+    // select efficiency
+    if (_fineTuneEfficiency) {
+      _fEfficiency = (TF1*) _fFineTuneEff -> Clone();
+      _fEfficiency -> SetName(sEffName.Data());
+    } else {
+      _fEfficiency = (TF1*) _fSmoothEff -> Clone();
+      _fEfficiency -> SetName(sEffName.Data());
+    }
+  } else if (_removeErrors) {
     PrintInfo(16);
     const UInt_t nBins = _hEfficiency -> GetNbinsX();
     for (UInt_t iBin = 1; iBin < (nBins + 1); iBin++) {
