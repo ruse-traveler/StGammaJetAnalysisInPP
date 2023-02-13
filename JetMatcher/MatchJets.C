@@ -748,23 +748,38 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
   }
 
   // create map of tree-index to event / run no.
-  Int_t pMap[pEvts][3];
-  Int_t dMap[dEvts][3];
+  vector<Int_t>          parIndices;
+  vector<vector<Int_t> > pMap;
   for (UInt_t iPar = 0; iPar < pEvts; iPar++) {
+
+    // grab entry
     tPar -> GetEntry(iPar);
-    pMap[iPar][0] = iPar;
-    pMap[iPar][1] = pEventIndex;
-    pMap[iPar][2] = pRunId;
-  }
-  for (UInt_t iDet = 0; iDet < dEvts; iDet++) {
-    tDet -> GetEntry(iDet);
-    dMap[iDet][0] = iDet;
-    dMap[iDet][1] = dEventIndex;
-    dMap[iDet][2] = dRunId;
+
+    // add to map
+    parIndices.clear();
+    parIndices.push_back((Int_t) iPar);
+    parIndices.push_back(pEventIndex);
+    parIndices.push_back(pRunId);
+    pMap.push_back(parIndices);
   }
 
-  // vector for matching
-  vector<Int_t> matchIndices;
+  vector<Int_t>          detIndices;
+  vector<vector<Int_t> > dMap;
+  for (UInt_t iDet = 0; iDet < dEvts; iDet++) {
+
+    // grab entry
+    tDet -> GetEntry(iDet);
+
+    // add to map
+    detIndices.clear();
+    detIndices.push_back((Int_t) iDet);
+    detIndices.push_back(dEventIndex);
+    detIndices.push_back(dRunId);
+    dMap.push_back(detIndices);
+  }
+
+  // vectors for matching
+  vector<Int_t> jetMatchIndices;
   cout << "    Beginning event loop..." << endl;
 
   // event loop
@@ -804,7 +819,7 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
           }
         }
         break;
-    }  // end swich case
+    }  // end switch case
     const Bool_t didNotFindPar = (iParTree == -1);
     const Bool_t didNotFindDet = (iDetTree == -1);
     if (didNotFindPar || didNotFindDet) continue;
@@ -961,6 +976,7 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
         const Double_t dF   = dJetPhi  -> at(k);
         const Double_t dPt  = dJetPt   -> at(k);
         const Double_t dPtc = dPt - (dRho * dA);
+      cout << "CHECK0" << endl;
 
         // calculate delta phi
         Double_t dDf = dF - pTrgPhi;
@@ -1152,7 +1168,7 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
         hJetQtVsPt[2]   -> Fill(bPt, bQt);
         hJetQtVsDr[2]   -> Fill(bDr, bQt);
         hJetSvsDr[2]    -> Fill(bDr, bS);
-        matchIndices.push_back(bIndex);
+        jetMatchIndices.push_back(bIndex);
         nMatched++;
 
         // fill test and heuristic algorithms
@@ -1262,9 +1278,9 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
       }
     }  // end particle jet loop
 
-    UInt_t matchSize = (UInt_t) matchIndices.size();
+    UInt_t matchSize = (UInt_t) jetMatchIndices.size();
     if (nMatched != matchSize) {
-      cerr << "ERROR: matchIndices did something weird in event " << i << "..." << endl;
+      cerr << "ERROR: jetMatchIndices did something weird in event " << i << "..." << endl;
       breakVal = 1;
       break;
     }
@@ -1311,7 +1327,7 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
       // check if detector jet matches particle jet
       Bool_t isMatch = false;
       for (UInt_t k = 0; k < nMatched; k++) {
-        UInt_t m = (UInt_t) matchIndices.at(k);
+        UInt_t m = (UInt_t) jetMatchIndices.at(k);
         if (j == m) {
           isMatch = true;
           break;
@@ -1340,7 +1356,7 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
     hNumHardD   -> Fill(nHardD);
 
     // clear vector
-    matchIndices.clear();
+    jetMatchIndices.clear();
 
   }  // end event loop
 

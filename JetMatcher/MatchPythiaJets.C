@@ -594,21 +594,36 @@ void MatchPythiaJets(const TString pPath=SParDefault, const TString dPath=SDetDe
   }
 
   // create map of tree-index to event / run no.
-  Int_t pMap[pEvts][2];
-  Int_t dMap[dEvts][2];
+  vector<Int_t>          parIndices;
+  vector<vector<Int_t> > pMap;
   for (UInt_t iPar = 0; iPar < pEvts; iPar++) {
+
+    // grab entry
     tPar -> GetEntry(iPar);
-    pMap[iPar][0] = iPar;
-    pMap[iPar][1] = pEventIndex;
+
+    // add to map
+    parIndices.clear();
+    parIndices.push_back((Int_t) iPar);
+    parIndices.push_back(pEventIndex);
+    pMap.push_back(parIndices);
   }
+
+  vector<Int_t>          detIndices;
+  vector<vector<Int_t> > dMap;
   for (UInt_t iDet = 0; iDet < dEvts; iDet++) {
+
+    // grab entry
     tDet -> GetEntry(iDet);
-    dMap[iDet][0] = iDet;
-    dMap[iDet][1] = dEventIndex;
+
+    // add to map
+    detIndices.clear();
+    detIndices.push_back((Int_t) iDet);
+    detIndices.push_back(dEventIndex);
+    dMap.push_back(detIndices);
   }
 
   // vector for matching
-  vector<Int_t> matchIndices;
+  vector<Int_t> jetMatchIndices;
   cout << "    Beginning event loop..." << endl;
 
   // event loop
@@ -984,7 +999,7 @@ void MatchPythiaJets(const TString pPath=SParDefault, const TString dPath=SDetDe
         hJetQtVsPt[2]   -> Fill(bPt, bQt);
         hJetQtVsDr[2]   -> Fill(bDr, bQt);
         hJetSvsDr[2]    -> Fill(bDr, bS);
-        matchIndices.push_back(bIndex);
+        jetMatchIndices.push_back(bIndex);
         nMatched++;
       } else {
         hJetArea[6]     -> Fill(pA);
@@ -996,9 +1011,9 @@ void MatchPythiaJets(const TString pPath=SParDefault, const TString dPath=SDetDe
       }
     }  // end particle jet loop
 
-    UInt_t matchSize = (UInt_t) matchIndices.size();
+    UInt_t matchSize = (UInt_t) jetMatchIndices.size();
     if (nMatched != matchSize) {
-      cerr << "ERROR: matchIndices did something weird in event " << i << "..." << endl;
+      cerr << "ERROR: jetMatchIndices did something weird in event " << i << "..." << endl;
       breakVal = 1;
       break;
     }
@@ -1045,7 +1060,7 @@ void MatchPythiaJets(const TString pPath=SParDefault, const TString dPath=SDetDe
       // check if detector jet matches particle jet
       Bool_t isMatch = false;
       for (UInt_t k = 0; k < nMatched; k++) {
-        UInt_t m = (UInt_t) matchIndices.at(k);
+        UInt_t m = (UInt_t) jetMatchIndices.at(k);
         if (j == m) {
           isMatch = true;
           break;
@@ -1074,7 +1089,7 @@ void MatchPythiaJets(const TString pPath=SParDefault, const TString dPath=SDetDe
     hNumHardD   -> Fill(nHardD);
 
     // clear vector
-    matchIndices.clear();
+    jetMatchIndices.clear();
 
   }  // end event loop
 
