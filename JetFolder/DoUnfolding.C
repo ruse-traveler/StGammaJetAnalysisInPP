@@ -59,13 +59,13 @@ class StJetFolder;
 
 
 // input and output files
-static const TString pFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString sFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString mFile("closure/closureTest_modStats_et911r05rff/modifiedStats.detLvlRFF_withBinAndEtaCorr_pTbinFine.et911r05pi0.d9m8y2021.root");
-static const TString eFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-static const TString rFile("input/embed/pp200r9embed.forUnfolding_pTbinFine.et911pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-//static const TString oFile("pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinFine.et911r05qt05130");
-static const TString oFile("pp200r9rff.testingEffFineTune_smoothWithFineTune.et911r05qt05130");
+static const TString pFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString sFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString mFile("closure/closureTest_modStats_et1520r05rff/modifiedStats.detLvlRFF_withBinAndEtaCorr_pTbinBig.et1520r05pi0.d9m8y2021.root");
+static const TString eFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+static const TString rFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
+//static const TString oFile("pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinBig.et1520r05qt05130");
+static const TString oFile("pp200r9rff.testingEffFineTune_smoothWithFineTune.et1520r05qt05130");
 // input histograms
 static const TString pName("hSumParFF");
 static const TString sName("hSumDetFF");
@@ -96,7 +96,7 @@ static const Bool_t  doPriorSmooth = false;    // smooth prior
 static const Bool_t  doPriorCutoff = false;    // apply a smooth cutoff to prior
 static const Bool_t  doEffFineTune = true;     // fine tune efficiency after smoothing
 static const Bool_t  removeEffErr  = false;    // remove errors on efficiency
-static const UInt_t  eTtrgIndex    = 0;        // eTrg range (controls how prior is smoothed): 0 = 9 - 11, 1 = 11 - 15, 2 = 15 - 20 
+static const UInt_t  eTtrgIndex    = 2;        // eTrg range (controls how prior is smoothed): 0 = 9 - 11, 1 = 11 - 15, 2 = 15 - 20 
 static const UInt_t  trigType      = 2;        // 0 = "gamma-dir", 1 = "gamma-rich", 2 = "pi0", 3 = "h+-" (controls if negative bins are checked for)
 static const Float_t pTpriMin      = 0.;
 static const Float_t pTpriMax      = 57.;

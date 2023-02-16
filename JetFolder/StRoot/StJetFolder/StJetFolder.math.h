@@ -340,4 +340,29 @@ Double_t StJetFolder::Landau(const Double_t *x, const Double_t *p) {
 
 }  // end 'Landau(Double_t*, Double_t*)'
 
+
+Double_t StJetFolder::FineTuneEff(const Double_t *x, const Double_t *p) {
+
+  const Double_t pT    = x[0];
+  const Double_t eff0  = p[0];
+  const Double_t sig0  = p[1];
+  const Double_t res0  = p[2];
+  const Double_t res1  = p[3];
+  const Double_t res2  = p[4];
+  const Double_t effHi = p[5];
+  const Double_t pThi  = p[6];
+
+  // scale factor
+  const Double_t effPieceHi  = eff0 * (1. - TMath::Exp(-1. * sig0 * pThi));
+  const Double_t polPieceHi  = res0 + (res1 * pThi) + (res2 * pThi * pThi);
+  const Double_t scaleFactor = effHi / (effPieceHi * polPieceHi);
+
+  // calculate efficiency
+  const Double_t effPiece    = eff0 * (1. - TMath::Exp(-1. * sig0 * pT));
+  const Double_t polPiece    = res0 + (res1 * pT) + (res2 * pT * pT);
+  const Double_t fineTuneEff = scaleFactor * effPiece * polPiece;
+  return fineTuneEff;
+
+}  // end 'FineTuneEff(Double_t*, Double_t*)'
+
 // End ------------------------------------------------------------------------

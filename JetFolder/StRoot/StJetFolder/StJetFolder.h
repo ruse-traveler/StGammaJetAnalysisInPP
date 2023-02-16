@@ -117,6 +117,7 @@ public:
   static Double_t Exponential(const Double_t *x, const Double_t *p);
   static Double_t PowerLaw(const Double_t *x, const Double_t *p);
   static Double_t Landau(const Double_t *x, const Double_t *p);
+  static Double_t FineTuneEff(const Double_t *x, const Double_t *p);
 
 
 private:
@@ -160,6 +161,7 @@ private:
   TF1       *_fSmoothEff;
   TF1       *_fFineTuneEff;
   TF1       *_fEfficiency;
+  TF1       *_fHighPtEff;
   TF1       *_fQtSmooth[NPtPar];
   TF1       *_fSmoothPrior;
   TF1       *_fParToSample;
