@@ -157,7 +157,6 @@ void StJetFolder::SetEfficiency(const Char_t *eFile, const Char_t *eName, const 
   const TString sEffHigh("[0]");
   const TString sEffPol("[0] + [1]*x + [2]*x*x");
   const TString sEffFunc("[0] * (1 - TMath::Exp(-1.*[1]*x))");
-  const TString sEffFine("[0] * (1 - TMath::Exp(-1.*[1]*2)) * ([2] + [3]*x + [4]*x*x)");
   const TString sEffParNames[NParEff] = {"#epsilon_{0}", "#sigma"};
   const Float_t xEffRange[NRange]     = {0.,  100.};
   const Float_t xFitRange[NRange]     = {0.,  15.};
