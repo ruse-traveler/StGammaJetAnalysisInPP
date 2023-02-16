@@ -64,7 +64,6 @@ static const TString sFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et152
 static const TString mFile("closure/closureTest_modStats_et1520r05rff/modifiedStats.detLvlRFF_withBinAndEtaCorr_pTbinBig.et1520r05pi0.d9m8y2021.root");
 static const TString eFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
 static const TString rFile("input/embed/pp200r9embed.forUnfolding_pTbinBig.et1520pt0230x021Kvz55pi0.r05a065rm1chrg.dr05qt05130.root");
-//static const TString oFile("pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinBig.et1520r05qt05130");
 static const TString oFile("pp200r9rff.testingEffFineTune_smoothWithFineTune.et1520r05qt05130");
 // input histograms
 static const TString pName("hSumParFF");
