@@ -32,8 +32,8 @@ void MakeTriggerMatrixPlotForPaper() {
 
   // io parameters
   const TString sOutput("trigMatrixForLongPaper.et630pi0vsGam.d21m2y2023.root");
-  const TString sInGam("triggerMatrix.forPaper_noShapeWeights_withWeightSmooth.et650x650vz55tsp0206gam.d22m11y2022.root");
-  const TString sInPi0("triggerMatrix.forPaper_noShapeWeights_withWeightSmooth.et650x650vz55tsp008pi0.d22m11y2022.root");
+  const TString sInGam("output/2022/November2022/triggerMatrix.forPaper_noShapeWeights_withWeightSmooth.et650x650vz55tsp0206gam.d22m11y2022.root");
+  const TString sInPi0("output/2022/November2022/triggerMatrix.forPaper_noShapeWeights_withWeightSmooth.et650x650vz55tsp008pi0.d22m11y2022.root");
   const TString sHistGam("hTriggerMatrix");
   const TString sHistPi0("hTriggerMatrix");
   const TString sNameGam("hMatrixGam");
@@ -95,7 +95,7 @@ void MakeTriggerMatrixPlotForPaper() {
   const Float_t fLbl(0.03);
   const Float_t fOffX(1.);
   const Float_t fOffY(1.1);
-  const Float_t fOffZ(1.);
+  const Float_t fOffZ(1.2);
   const Float_t fOffL(0.07);
   const Float_t fOffLZ(0.001);
   const TString sTitleZ("Probability Density");
@@ -180,8 +180,10 @@ void MakeTriggerMatrixPlotForPaper() {
   const UInt_t  fLogX(0);
   const UInt_t  fLogY(0);
   const UInt_t  fLogZ(1);
-  const Float_t fMarginR(0.015);
-  const Float_t fMarginL(0.015);
+  const Float_t fMarginRG(0.015);
+  const Float_t fMarginRP(0.17);
+  const Float_t fMarginLG(0.10);
+  const Float_t fMarginLP(0.015);
   const Float_t xyPadGam[NVtx] = {0.,  0., 0.5, 1.};
   const Float_t xyPadPi0[NVtx] = {0.5, 0., 1.,  1.};
 
@@ -196,7 +198,8 @@ void MakeTriggerMatrixPlotForPaper() {
   pGam    -> SetTicks(fTick, fTick);
   pGam    -> SetBorderMode(fMode);
   pGam    -> SetBorderSize(fBord);
-  pGam    -> SetRightMargin(fMarginR);
+  pGam    -> SetLeftMargin(fMarginLG);
+  pGam    -> SetRightMargin(fMarginRG);
   pGam    -> SetLogx(fLogX);
   pGam    -> SetLogy(fLogY);
   pGam    -> SetLogz(fLogZ);
@@ -204,7 +207,8 @@ void MakeTriggerMatrixPlotForPaper() {
   pPi0    -> SetTicks(fTick, fTick);
   pPi0    -> SetBorderMode(fMode);
   pPi0    -> SetBorderSize(fBord);
-  pPi0    -> SetLeftMargin(fMarginL);
+  pPi0    -> SetLeftMargin(fMarginLP);
+  pPi0    -> SetRightMargin(fMarginRP);
   pPi0    -> SetLogx(fLogX);
   pPi0    -> SetLogy(fLogY);
   pPi0    -> SetLogz(fLogZ);
