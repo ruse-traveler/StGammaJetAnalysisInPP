@@ -2,8 +2,8 @@
 // Derek Anderson
 // 02.21.2023
 //
-// Use this to make trigger eT matrix
-// for long paper.
+// Use this to make the trigger eT
+// matrix for the long paper.
 
 #include <fstream>
 #include <iostream>
