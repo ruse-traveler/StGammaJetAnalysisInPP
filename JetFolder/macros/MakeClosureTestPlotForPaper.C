@@ -24,7 +24,7 @@ using namespace std;
 
 // global constants
 const UInt_t NVtx(4);
-const UInt_t NTxt(4);
+const UInt_t NTxt(5);
 const UInt_t NHist(2);
 const UInt_t NRange(2);
 
@@ -38,8 +38,8 @@ void MakeClosureTestPlotForPaper() {
   cout << "\n  Plotting closure test for paper..." << endl;
 
   // io file parameters
-  const TString sIn("closureTestFF.forThesis_pTbinHuge.et911r05pi0.d9m2y2022.root");
-  const TString sOut("closureTestForPaper.ffWithRff_pTbinHuge.et911r05pi0.d5m3y2023.root");
+  const TString sIn("closure/et911r02ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r02pi0.d9m2y2022.root");
+  const TString sOut("closureTestForPaper_withAprGpcComments.ffWithRff_pTbinHuge.et911r02pi0.d5m3y2023.root");
 
   // io histogram parameters
   const TString sParticle("hParticleWithStat");
@@ -50,8 +50,8 @@ void MakeClosureTestPlotForPaper() {
   const TString sNameRat[NHist] = {"hRatioValue",       "hRatioError"};
 
   // style parameters
-  const TString sTitleX("p_{T,jet}^{ch} [GeV/c]");
-  const TString sTitleY("1/N_{trig} dN^{2}_{jets}/(dp_{T,jet}^{reco,ch} d#eta_{jet}) [GeV/c]^{-1}");
+  const TString sTitleX("p_{T,jet}^{ch} [GeV/#it{c}]");
+  const TString sTitleY("1/N_{trig} dN^{2}_{jets}/(dp_{T,jet}^{reco,ch} d#eta_{jet}) [GeV/#it{c}]^{-1}");
   const TString sTitleR("#frac{Corrected}{PYTHIA}");
   const UInt_t  fColPar(2);
   const UInt_t  fColOut(1);
@@ -85,7 +85,7 @@ void MakeClosureTestPlotForPaper() {
   const UInt_t   height(800);
   const Double_t xyTxt[NVtx]   = {0.52, 0.69,  0.79,  0.96};
   const Double_t xyRatio[NVtx] = {0.02, 0.007, 0.917, 0.377};
-  const TString  sTxt[NTxt]    = {"Closure Test", "anti-k_{T}, R=0.5", "9 < p_{T}^{trig} < 11 GeV/c", "#pi^{0}+jet"};
+  const TString  sTxt[NTxt]    = {"#bf{STAR}", "Closure Test", "anti-k_{T}, R=0.2", "9 < E_{T}^{trig} < 11 GeV", "#pi^{0}+jet"};
   const TString  sJetTxt("Corrected");
   const TString  sParTxt("PYTHIA");
 
@@ -212,6 +212,7 @@ void MakeClosureTestPlotForPaper() {
   cout << "    Made frame histograms." << endl;
 
   TLegend *legTxt = new TLegend(xyTxt[0], xyTxt[1], xyTxt[2], xyTxt[3]);
+  legTxt -> SetTextFont(42);
   legTxt -> SetTextSize(0.036);  
   legTxt -> SetFillColor(0);   
   legTxt -> SetLineColor(0);
@@ -263,7 +264,7 @@ void MakeClosureTestPlotForPaper() {
   pRatio      -> SetLeftMargin(0.1784615);
   pRatio      -> SetRightMargin(0.01692308);
   pRatio      -> SetTopMargin(0.007434944);
-  pRatio      -> SetBottomMargin(0.3345725);
+  pRatio      -> SetBottomMargin(0.3945725);
   pRatio      -> SetFrameBorderMode(0);
   pRatio      -> SetFrameBorderMode(0);
   hFrameRatio -> DrawCopy("9");

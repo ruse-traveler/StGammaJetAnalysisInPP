@@ -34,16 +34,16 @@ void MakeTriggerEnergyPlotForPaper() {
   cout << "\n  Beginning trigger energy plot maker..." << endl;
 
   // io parameters
-  const TString sOutput("triggerEnergyPlotForPaper.et630pi0vsGam.d24m2y2023.root");
-  const TString sInParG("trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root");
+  const TString sOutput("triggerEnergyPlotForPaper_withAprGpcComments.et630pi0vsGam.d20m4y2023.root");
+  const TString sInParG("output/2022/November2022/trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root");
   const TString sInParP("FromSaskia/TriggerET_625_Pythia6_Combine_et6_and8.root");
   const TString sHistParG("hEtTrgParAllWeight");
   const TString sHistParP("hTrgSumProb");
   const TString sNameParG("hParGam");
   const TString sNameParP("hParPi0");
-  const TString sInMatchG[NGam]   = {"trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root",
-                                     "trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root",
-                                     "trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root"};
+  const TString sInMatchG[NGam]   = {"output/2022/November2022/trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root",
+                                     "output/2022/November2022/trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root",
+                                     "output/2022/November2022/trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root"};
   const TString sInMatchP[NPi0]   = {"FromSaskia/TriggerET_smearedPythia.root",
                                      "FromSaskia/TriggerET_smearedPythia.root"};
   const TString sHistMatchG[NGam] = {"hEtMatch911",
@@ -59,12 +59,12 @@ void MakeTriggerEnergyPlotForPaper() {
 
   // text parameters
   const TString sTitleY("Probability Density");
-  const TString sTitleGam("");
-  const TString sTitlePi0("");
+  const TString sTitleGam("#bf{STAR} simulation #gamma");
+  const TString sTitlePi0("#bf{STAR} simulation #pi^{0}");
   const TString sTitleGamX("E_{T}^{#gamma,part}, E_{T}^{#gamma,part-match} [GeV]");
-  const TString sTitlePi0X("E_{T}^{#gamma,part}, E_{T}^{#gamma,part-match} [GeV]");
-  const TString sLegPar("Generated");
-  const TString sLegMatch("Smeared");
+  const TString sTitlePi0X("E_{T}^{#pi^{0},part}, E_{T}^{#pi^{0},part-match} [GeV]");
+  const TString sLegParG("Generated #gamma");
+  const TString sLegParP("Generated #pi^{0}");
   const TString sLegGam[NGam] = {"9 < E_{T}^{#gamma,det-clust} < 11 GeV",
                                  "11 < E_{T}^{#gamma,det-clust} < 15 GeV",
                                  "15 < E_{T}^{#gamma,det-clust} < 20 GeV"};
@@ -81,7 +81,7 @@ void MakeTriggerEnergyPlotForPaper() {
   const UInt_t  fColPi0[NPi0]     = {859, 899};
   const UInt_t  fMarGam[NGam]     = {20,  22,  21};
   const UInt_t  fMarPi0[NPi0]     = {20,  22};
-  const Float_t yRange[NRange]    = {0.000000007, 3333.};
+  const Float_t yRange[NRange]    = {0.000000007, 3.};
   const Float_t xGamRange[NRange] = {6., 30.};
   const Float_t xPi0Range[NRange] = {6., 25.};
 
@@ -248,55 +248,50 @@ void MakeTriggerEnergyPlotForPaper() {
   const UInt_t  fLin(1);
   const UInt_t  fWid(1);
   const UInt_t  fFil(0);
-  const Float_t fLbl(0.03);
-  const Float_t fOffX(1.);
-  const Float_t fOffY(1.1);
-  const Float_t fOffL(0.07);
+  const UInt_t  nDivX(505);
+  const UInt_t  nDivY(504);
+  const Float_t fTickLX(0.04);
+  const Float_t fTickLY(0.04);
+  const Float_t fTtlX(0.045);
+  const Float_t fTtlY(0.045);
+  const Float_t fLblX(0.055);
+  const Float_t fLblY(0.055);
+  const Float_t fOffX(1.4);
+  const Float_t fOffY(1.5);
+  const Float_t fOffLX(0.005);
+  const Float_t fOffLY(0.005);
+  const Float_t fOffLblNudge(0.001);
+
+  // set gamma styles
   hParG -> SetMarkerColor(fColParG);
   hParG -> SetMarkerStyle(fMarParG);
   hParG -> SetLineColor(fColParG);
   hParG -> SetLineStyle(fLin);
   hParG -> SetFillColor(fColParG);
   hParG -> SetFillStyle(fFil);
-  hParG -> SetTitle(sTitleGam.Data());
+  hParG -> SetTitle("");
   hParG -> SetTitleFont(fTxt);
   hParG -> GetXaxis() -> SetRangeUser(xGamRange[0], xGamRange[1]);
+  hParG -> GetXaxis() -> SetNdivisions(nDivX);
+  hParG -> GetXaxis() -> SetTickLength(fTickLX);
   hParG -> GetXaxis() -> SetLabelFont(fTxt);
-  hParG -> GetXaxis() -> SetLabelSize(fLbl);
+  hParG -> GetXaxis() -> SetLabelSize(fLblX);
+  hParG -> GetXaxis() -> SetLabelOffset(fOffLX);
   hParG -> GetXaxis() -> SetTitle(sTitleGamX.Data());
   hParG -> GetXaxis() -> SetTitleFont(fTxt);
+  hParG -> GetXaxis() -> SetTitleSize(fTtlX);
   hParG -> GetXaxis() -> SetTitleOffset(fOffX);
   hParG -> GetXaxis() -> CenterTitle(fCnt);
   hParG -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+  hParG -> GetYaxis() -> SetNdivisions(nDivY);
   hParG -> GetYaxis() -> SetLabelFont(fTxt);
-  hParG -> GetYaxis() -> SetLabelSize(fLbl);
+  hParG -> GetYaxis() -> SetLabelSize(fLblY);
+  hParG -> GetYaxis() -> SetLabelOffset(fOffLY);
   hParG -> GetYaxis() -> SetTitle(sTitleY.Data());
   hParG -> GetYaxis() -> SetTitleFont(fTxt);
+  hParG -> GetYaxis() -> SetTitleSize(fTtlY);
   hParG -> GetYaxis() -> SetTitleOffset(fOffY);
   hParG -> GetYaxis() -> CenterTitle(fCnt);
-  hParP -> SetMarkerColor(fColParP);
-  hParP -> SetMarkerStyle(fMarParP);
-  hParP -> SetLineColor(fColParP);
-  hParP -> SetLineStyle(fLin);
-  hParP -> SetFillColor(fColParP);
-  hParP -> SetFillStyle(fFil);
-  hParP -> SetTitle(sTitlePi0.Data());
-  hParP -> SetTitleFont(fTxt);
-  hParP -> GetXaxis() -> SetRangeUser(xPi0Range[0], xPi0Range[1]);
-  hParP -> GetXaxis() -> SetLabelFont(fTxt);
-  hParP -> GetXaxis() -> SetLabelSize(fLbl);
-  hParP -> GetXaxis() -> SetTitle(sTitlePi0X.Data());
-  hParP -> GetXaxis() -> SetTitleFont(fTxt);
-  hParP -> GetXaxis() -> SetTitleOffset(fOffX);
-  hParP -> GetXaxis() -> CenterTitle(fCnt);
-  hParP -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
-  hParP -> GetYaxis() -> SetLabelFont(fTxt);
-  hParP -> GetYaxis() -> SetLabelSize(fLbl);
-  hParP -> GetYaxis() -> SetLabelOffset(fOffL);
-  hParP -> GetYaxis() -> SetTitle(sTitleY.Data());
-  hParP -> GetYaxis() -> SetTitleFont(fTxt);
-  hParP -> GetYaxis() -> SetTitleOffset(fOffY);
-  hParP -> GetYaxis() -> CenterTitle(fCnt);
   for (UInt_t iGam = 0; iGam < NGam; iGam++) {
     hMatchG[iGam] -> SetMarkerColor(fColGam[iGam]);
     hMatchG[iGam] -> SetMarkerStyle(fMarGam[iGam]);
@@ -304,23 +299,62 @@ void MakeTriggerEnergyPlotForPaper() {
     hMatchG[iGam] -> SetLineStyle(fLin);
     hMatchG[iGam] -> SetFillColor(fColGam[iGam]);
     hMatchG[iGam] -> SetFillStyle(fFil);
-    hMatchG[iGam] -> SetTitle(sTitleGam.Data());
+    hMatchG[iGam] -> SetTitle("");
     hMatchG[iGam] -> SetTitleFont(fTxt);
     hMatchG[iGam] -> GetXaxis() -> SetRangeUser(xGamRange[0], xGamRange[1]);
+    hMatchG[iGam] -> GetXaxis() -> SetNdivisions(nDivX);
+    hMatchG[iGam] -> GetXaxis() -> SetTickLength(fTickLX);
     hMatchG[iGam] -> GetXaxis() -> SetLabelFont(fTxt);
-    hMatchG[iGam] -> GetXaxis() -> SetLabelSize(fLbl);
+    hMatchG[iGam] -> GetXaxis() -> SetLabelSize(fLblX);
+    hMatchG[iGam] -> GetXaxis() -> SetLabelOffset(fOffLX);
     hMatchG[iGam] -> GetXaxis() -> SetTitle(sTitleGamX.Data());
     hMatchG[iGam] -> GetXaxis() -> SetTitleFont(fTxt);
+    hMatchG[iGam] -> GetXaxis() -> SetTitleSize(fTtlX);
     hMatchG[iGam] -> GetXaxis() -> SetTitleOffset(fOffX);
     hMatchG[iGam] -> GetXaxis() -> CenterTitle(fCnt);
     hMatchG[iGam] -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+    hMatchG[iGam] -> GetYaxis() -> SetNdivisions(nDivY);
+    hMatchG[iGam] -> GetYaxis() -> SetTickLength(fTickLY);
     hMatchG[iGam] -> GetYaxis() -> SetLabelFont(fTxt);
-    hMatchG[iGam] -> GetYaxis() -> SetLabelSize(fLbl);
+    hMatchG[iGam] -> GetYaxis() -> SetLabelSize(fLblY);
+    hMatchG[iGam] -> GetYaxis() -> SetLabelOffset(fOffLY);
     hMatchG[iGam] -> GetYaxis() -> SetTitle(sTitleY.Data());
     hMatchG[iGam] -> GetYaxis() -> SetTitleFont(fTxt);
+    hMatchG[iGam] -> GetYaxis() -> SetTitleSize(fTtlY);
     hMatchG[iGam] -> GetYaxis() -> SetTitleOffset(fOffY);
     hMatchG[iGam] -> GetYaxis() -> CenterTitle(fCnt);
   }
+
+  // set pi0 styles
+  hParP -> SetMarkerColor(fColParP);
+  hParP -> SetMarkerStyle(fMarParP);
+  hParP -> SetLineColor(fColParP);
+  hParP -> SetLineStyle(fLin);
+  hParP -> SetFillColor(fColParP);
+  hParP -> SetFillStyle(fFil);
+  hParP -> SetTitle("");
+  hParP -> SetTitleFont(fTxt);
+  hParP -> GetXaxis() -> SetRangeUser(xPi0Range[0], xPi0Range[1]);
+  hParP -> GetXaxis() -> SetNdivisions(nDivX);
+  hParP -> GetXaxis() -> SetTickLength(fTickLX);
+  hParP -> GetXaxis() -> SetLabelFont(fTxt);
+  hParP -> GetXaxis() -> SetLabelSize(fLblX);
+  hParP -> GetXaxis() -> SetLabelOffset(fOffLX);
+  hParP -> GetXaxis() -> SetTitle(sTitlePi0X.Data());
+  hParP -> GetXaxis() -> SetTitleFont(fTxt);
+  hParP -> GetXaxis() -> SetTitleSize(fTtlX);
+  hParP -> GetXaxis() -> SetTitleOffset(fOffX);
+  hParP -> GetXaxis() -> CenterTitle(fCnt);
+  hParP -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+  hParP -> GetYaxis() -> SetNdivisions(nDivY);
+  hParP -> GetYaxis() -> SetLabelFont(fTxt);
+  hParP -> GetYaxis() -> SetLabelSize(fLblY);
+  hParP -> GetYaxis() -> SetLabelOffset(fOffLY);
+  hParP -> GetYaxis() -> SetTitle(sTitleY.Data());
+  hParP -> GetYaxis() -> SetTitleFont(fTxt);
+  hParP -> GetYaxis() -> SetTitleSize(fTtlY);
+  hParP -> GetYaxis() -> SetTitleOffset(fOffY);
+  hParP -> GetYaxis() -> CenterTitle(fCnt);
   for (UInt_t iPi0 = 0; iPi0 < NPi0; iPi0++) {
     hMatchP[iPi0] -> SetMarkerColor(fColPi0[iPi0]);
     hMatchP[iPi0] -> SetMarkerStyle(fMarPi0[iPi0]);
@@ -328,103 +362,112 @@ void MakeTriggerEnergyPlotForPaper() {
     hMatchP[iPi0] -> SetLineStyle(fLin);
     hMatchP[iPi0] -> SetFillColor(fColPi0[iPi0]);
     hMatchP[iPi0] -> SetFillStyle(fFil);
-    hMatchP[iPi0] -> SetTitle(sTitlePi0.Data());
+    hMatchP[iPi0] -> SetTitle("");
     hMatchP[iPi0] -> SetTitleFont(fTxt);
     hMatchP[iPi0] -> GetXaxis() -> SetRangeUser(xPi0Range[0], xPi0Range[1]);
+    hMatchP[iPi0] -> GetXaxis() -> SetNdivisions(nDivX);
     hMatchP[iPi0] -> GetXaxis() -> SetLabelFont(fTxt);
-    hMatchP[iPi0] -> GetXaxis() -> SetLabelSize(fLbl);
+    hMatchP[iPi0] -> GetXaxis() -> SetLabelSize(fLblX);
+    hMatchP[iPi0] -> GetXaxis() -> SetLabelOffset(fOffLX);
     hMatchP[iPi0] -> GetXaxis() -> SetTitle(sTitlePi0X.Data());
     hMatchP[iPi0] -> GetXaxis() -> SetTitleFont(fTxt);
+    hMatchP[iPi0] -> GetXaxis() -> SetTitleSize(fTtlX);
     hMatchP[iPi0] -> GetXaxis() -> SetTitleOffset(fOffX);
     hMatchP[iPi0] -> GetXaxis() -> CenterTitle(fCnt);
     hMatchP[iPi0] -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+    hMatchP[iPi0] -> GetYaxis() -> SetNdivisions(nDivY);
     hMatchP[iPi0] -> GetYaxis() -> SetLabelFont(fTxt);
-    hMatchP[iPi0] -> GetYaxis() -> SetLabelSize(fLbl);
-    hMatchP[iPi0] -> GetYaxis() -> SetLabelOffset(fOffL);
+    hMatchP[iPi0] -> GetYaxis() -> SetLabelSize(fLblY);
+    hMatchP[iPi0] -> GetYaxis() -> SetLabelOffset(fOffLY);
     hMatchP[iPi0] -> GetYaxis() -> SetTitle(sTitleY.Data());
     hMatchP[iPi0] -> GetYaxis() -> SetTitleFont(fTxt);
+    hMatchP[iPi0] -> GetYaxis() -> SetTitleSize(fTtlY);
     hMatchP[iPi0] -> GetYaxis() -> SetTitleOffset(fOffY);
     hMatchP[iPi0] -> GetYaxis() -> CenterTitle(fCnt);
   }
+  // make legends
+  const UInt_t  fColLeg      = 0;
+  const UInt_t  fLinLeg      = 0;
+  const UInt_t  fAlnLeg      = 12;
+  const Float_t fTxtSizL     = 0.04;
+  const Float_t xyLegG[NVtx] = {0.46, 0.77, 0.80, 0.95};
+  const Float_t xyLegP[NVtx] = {0.46, 0.82, 0.80, 0.95};
 
-  // make histogram for legend
-  hParL   = (TH1D*) hParG      -> Clone();
-  hMatchL = (TH1D*) hMatchG[0] -> Clone();
-  hParL   -> SetName("hParLegend");
-  hMatchL -> SetName("hMatchLegend");
-  hParL   -> SetMarkerColor(fColHistL);
-  hMatchL -> SetMarkerColor(fColHistL);
-  hParL   -> SetFillColor(fColHistL);
-  hMatchL -> SetFillColor(fColHistL);
-  hParL   -> SetLineColor(fColHistL);
-  hMatchL -> SetLineColor(fColHistL);
-  cout << "    Set styles." << endl;
+  TLegend *legGam = new TLegend(xyLegG[0], xyLegG[1], xyLegG[2], xyLegG[3]);
+  legGam -> SetLineColor(fColLeg);
+  legGam -> SetLineStyle(fLinLeg);
+  legGam -> SetFillColor(fColLeg);
+  legGam -> SetLineColor(fLinLeg);
+  legGam -> SetTextFont(fTxt);
+  legGam -> SetTextSize(fTxtSizL);
+  legGam -> SetTextAlign(fAlnLeg);
+  legGam -> AddEntry((TObject*) 0, sTitleGam.Data(), "");
+  legGam -> AddEntry(hParG,        sLegParG.Data(),  "lp");
+  for (UInt_t iGam = 0; iGam < NGam; iGam++) {
+    legGam -> AddEntry(hMatchG[iGam], sLegGam[iGam].Data(), "lp");
+  }
 
-  // make legend
-  const UInt_t  fColLeg(0);
-  const UInt_t  fLinLeg(0);
-  const UInt_t  fColLin(1);
-  const UInt_t  fAlnLeg(12);
-  const UInt_t  nColumn(3);
-  const Float_t xyLeg[NVtx] = {0.05, 0.015, 0.95, 0.9};
-
-  TLegend *leg = new TLegend(xyLeg[0], xyLeg[1], xyLeg[2], xyLeg[3]); 
-  leg -> SetFillColor(fColLeg);
-  leg -> SetLineColor(fColLin);
-  leg -> SetTextFont(fTxt);
-  leg -> SetTextAlign(fAlnLeg);
-  leg -> SetNColumns(nColumn);
-  leg -> AddEntry(hMatchG[0], sLegGam[0].Data(), "pf");
-  leg -> AddEntry(hMatchP[0], sLegPi0[0].Data(), "pf");
-  leg -> AddEntry(hParL,      sLegPar.Data(),    "pf");
-  leg -> AddEntry(hMatchG[1], sLegGam[1].Data(), "pf");
-  leg -> AddEntry(hMatchP[1], sLegPi0[1].Data(), "pf");
-  leg -> AddEntry(hMatchL,    sLegMatch.Data(),  "pf");
-  leg -> AddEntry(hMatchG[2], sLegGam[2].Data(), "pf");
-  cout << "    Made legend." << endl;
+  TLegend *legPi0 = new TLegend(xyLegP[0], xyLegP[1], xyLegP[2], xyLegP[3]);
+  legPi0 -> SetLineColor(fColLeg);
+  legPi0 -> SetLineStyle(fLinLeg);
+  legPi0 -> SetFillColor(fColLeg);
+  legPi0 -> SetLineColor(fLinLeg);
+  legPi0 -> SetTextFont(fTxt);
+  legPi0 -> SetTextSize(fTxtSizL);
+  legPi0 -> SetTextAlign(fAlnLeg);
+  legPi0 -> AddEntry((TObject*) 0, sTitlePi0.Data(), "");
+  legPi0 -> AddEntry(hParP,        sLegParP.Data(),  "lp");
+  for (UInt_t iPi0 = 0; iPi0 < NPi0; iPi0++) {
+    legPi0 -> AddEntry(hMatchP[iPi0], sLegPi0[iPi0].Data(), "lp");
+  }
+  cout << "    Made legends." << endl;
 
   // make plot
-  const UInt_t  width(1900);
-  const UInt_t  height(1056);
-  const UInt_t  fMode(0);
-  const UInt_t  fBord(2);
-  const UInt_t  fGrid(0);
-  const UInt_t  fGridL(0);
-  const UInt_t  fTick(1);
-  const UInt_t  fTickL(0);
-  const UInt_t  fLogX(0);
-  const UInt_t  fLogY(1);
-  const UInt_t  fLogYL(0);
-  const Float_t fMarginTG(0.015);
-  const Float_t fMarginTP(0.015);
-  const Float_t fMarginTL(0.015);
-  const Float_t fMarginBG(0.1);
-  const Float_t fMarginBP(0.1);
-  const Float_t fMarginBL(0.015);
-  const Float_t fMarginRG(0.015);
-  const Float_t fMarginRP(0.1);
-  const Float_t fMarginRL(0.1);
-  const Float_t fMarginLG(0.1);
-  const Float_t fMarginLP(0.015);
-  const Float_t fMarginLL(0.1);
-  const Float_t xyPadGam[NVtx] = {0.,  0.,  0.5, 0.9};
-  const Float_t xyPadPi0[NVtx] = {0.5, 0.,  1.,  0.9};
-  const Float_t xyPadLeg[NVtx] = {0.,  0.9, 1.,  1.};
+  const UInt_t  padWidth       = 660;
+  const UInt_t  padHeight      = 760;
+  const UInt_t  width          = 2 * padWidth;
+  const UInt_t  height         = padHeight;
+  const UInt_t  fMode          = 0;
+  const UInt_t  fBord          = 2;
+  const UInt_t  fGrid          = 0;
+  const UInt_t  fTick          = 1;
+  const UInt_t  fLogX          = 0;
+  const UInt_t  fLogY          = 1;
+  const UInt_t  fColBord       = 0;
+  const Float_t fMarginT       = 0.05;
+  const Float_t fMarginB       = 0.15;
+  const Float_t fMarginRG      = 0.025;
+  const Float_t fMarginRP      = 0.17;
+  const Float_t fMarginLG      = 0.15;
+  const Float_t fMarginLP      = 0.005;
+  const Float_t xyPadGam[NVtx] = {0.,  0.,   0.5, 1.};
+  const Float_t xyPadPi0[NVtx] = {0.5, 0.,   1.,  1.};
 
   TCanvas *cPlot = new TCanvas("cPlot", "", width, height);
   TPad    *pGam    = new TPad("pGam", "", xyPadGam[0], xyPadGam[1], xyPadGam[2], xyPadGam[3]);
   TPad    *pPi0    = new TPad("pPi0", "", xyPadPi0[0], xyPadPi0[1], xyPadPi0[2], xyPadPi0[3]);
-  TPad    *pLeg    = new TPad("pLeg", "", xyPadLeg[0], xyPadLeg[1], xyPadLeg[2], xyPadLeg[3]);
+
+  // set canvas options
   cPlot -> SetGrid(fGrid, fGrid);
   cPlot -> SetTicks(fTick, fTick);
   cPlot -> SetBorderMode(fMode);
   cPlot -> SetBorderSize(fBord);
+  cPlot -> SetTopMargin(fMarginT);
+  cPlot -> SetBottomMargin(fMarginB);
+  cPlot -> SetLeftMargin(fMarginLG);
+  cPlot -> SetRightMargin(fMarginRP);
+  cPlot -> SetLogx(fLogX);
+  cPlot -> SetLogy(fLogY);
+
+  // set pad options
   pGam  -> SetGrid(fGrid, fGrid);
   pGam  -> SetTicks(fTick, fTick);
   pGam  -> SetBorderMode(fMode);
   pGam  -> SetBorderSize(fBord);
-  pGam  -> SetTopMargin(fMarginTG);
-  pGam  -> SetBottomMargin(fMarginBG);
+  pGam  -> SetFrameLineColor(fColBord);
+  pGam  -> SetFrameBorderMode(fMode);
+  pGam  -> SetTopMargin(fMarginT);
+  pGam  -> SetBottomMargin(fMarginB);
   pGam  -> SetLeftMargin(fMarginLG);
   pGam  -> SetRightMargin(fMarginRG);
   pGam  -> SetLogx(fLogX);
@@ -433,49 +476,40 @@ void MakeTriggerEnergyPlotForPaper() {
   pPi0  -> SetTicks(fTick, fTick);
   pPi0  -> SetBorderMode(fMode);
   pPi0  -> SetBorderSize(fBord);
-  pPi0  -> SetTopMargin(fMarginTP);
-  pPi0  -> SetBottomMargin(fMarginBP);
+  pPi0  -> SetFrameLineColor(fColBord);
+  pPi0  -> SetFrameBorderMode(fMode);
+  pPi0  -> SetTopMargin(fMarginT);
+  pPi0  -> SetBottomMargin(fMarginB);
   pPi0  -> SetLeftMargin(fMarginLP);
   pPi0  -> SetRightMargin(fMarginRP);
   pPi0  -> SetLogx(fLogX);
   pPi0  -> SetLogy(fLogY);
-  pLeg  -> SetGrid(fGridL, fGridL);
-  pLeg  -> SetTicks(fTickL, fTickL);
-  pLeg  -> SetBorderMode(fMode);
-  pLeg  -> SetBorderSize(fBord);
-  pLeg  -> SetTopMargin(fMarginTL);
-  pLeg  -> SetBottomMargin(fMarginBL);
-  pLeg  -> SetLeftMargin(fMarginLL);
-  pLeg  -> SetRightMargin(fMarginRL);
-  pLeg  -> SetLogx(fLogX);
-  pLeg  -> SetLogy(fLogYL);
+
+  // make plot
   cPlot -> cd();
   pGam  -> Draw();
   pPi0  -> Draw();
-  pLeg  -> Draw();
   pGam  -> cd();
   hParG -> Draw();
   for (UInt_t iGam = 0; iGam < NGam; iGam++) {
     hMatchG[iGam] -> Draw("same");
   }
-  pPi0  -> cd();
-  hParP -> Draw();
+  legGam -> Draw();
+  pPi0   -> cd();
+  hParP  -> Draw();
   for (UInt_t iPi0 = 0; iPi0 < NPi0; iPi0++) {
     hMatchP[iPi0] -> Draw("same");
   }
-  pLeg  -> cd();
-  leg   -> Draw();
-  fOut  -> cd();
-  cPlot -> Write();
-  cPlot -> Close();
+  legPi0 -> Draw();
+  fOut   -> cd();
+  cPlot  -> Write();
+  cPlot  -> Close();
   cout << "    Made plot." << endl;
 
   // save input
   fOut    -> cd();
   hParG   -> Write();
   hParP   -> Write();
-  hParL   -> Write();
-  hMatchL -> Write();
   for (UInt_t iGam = 0; iGam < NGam; iGam++) {
     hMatchG[iGam] -> Write();
   }

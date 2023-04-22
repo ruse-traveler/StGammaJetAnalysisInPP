@@ -35,10 +35,10 @@ void MakeSmearingWeightPlotForPaper() {
   cout << "\n  Beginning smearing weight plot maker..." << endl;
 
   // io parameters
-  const TString sOutput("smearingWeightsForPaper.et630pi0vsGam.d23m2y2023.root");
-  const TString sInGam[NGam]   = {"matrixProjections.forPaper.et650gam.d30m11y2022.root",
-                                  "matrixProjections.forPaper.et650gam.d30m11y2022.root",
-                                  "matrixProjections.forPaper.et650gam.d30m11y2022.root"};
+  const TString sOutput("smearingWeightsForPaper_betterTitles_withAprGpcComments.et630pi0vsGam.d20m4y2023.root");
+  const TString sInGam[NGam]   = {"output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root",
+                                  "output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root",
+                                  "output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root"};
   const TString sInPi0[NPi0]   = {"FromSaskia/Weight_pi0_911.root",
                                   "FromSaskia/Weight_pi0_1115.root"};
   const TString sHistGam[NGam] = {"hSmearEt911",
@@ -53,11 +53,11 @@ void MakeSmearingWeightPlotForPaper() {
                                   "hPi0WeightsEt1115"};
 
   // text parameters
-  const TString sTitleY("Relative smearing weights (arbitrary normalization)");
-  const TString sTitleGam("STAR simulation #gamma");
-  const TString sTitlePi0("STAR simulation #pi^{0}");
+  const TString sTitleY("Relative smearing weights (arb. norm.)");
+  const TString sTitleGam("#bf{STAR} simulation #gamma");
+  const TString sTitlePi0("#bf{STAR} simulation #pi^{0}");
   const TString sTitleGamX("E_{T}^{#gamma,part-match} [GeV]");
-  const TString sTitlePi0X("E_{T}^{#gamma,part-match} [GeV]");
+  const TString sTitlePi0X("E_{T}^{#pi^{0},part-match} [GeV]");
   const TString sLegGam[NGam] = {"9 < E_{T}^{#gamma,det-clust} < 11 GeV",
                                  "11 < E_{T}^{#gamma,det-clust} < 15 GeV",
                                  "15 < E_{T}^{#gamma,det-clust} < 20 GeV"};
@@ -65,7 +65,7 @@ void MakeSmearingWeightPlotForPaper() {
                                  "11 < E_{T}^{#pi^{0},det-clust} < 15 GeV"};
 
   // plot parameters
-  const Float_t yRange[NRange]    = {0.0000007, 77.};
+  const Float_t yRange[NRange]    = {0.0000007, 333.};
   const Float_t xGamRange[NRange] = {6., 30.};
   const Float_t xPi0Range[NRange] = {6., 25.};
   const UInt_t  fColGam[NGam]     = {799, 899, 859};
@@ -168,10 +168,19 @@ void MakeSmearingWeightPlotForPaper() {
   const UInt_t  fLin(1);
   const UInt_t  fWid(1);
   const UInt_t  fFil(0);
-  const Float_t fLbl(0.03);
-  const Float_t fOffX(1.);
-  const Float_t fOffY(1.1);
-  const Float_t fOffL(0.07);
+  const UInt_t  nDivX(505);
+  const UInt_t  nDivY(504);
+  const Float_t fTickLX(0.04);
+  const Float_t fTickLY(0.04);
+  const Float_t fTtlX(0.045);
+  const Float_t fTtlY(0.045);
+  const Float_t fLblX(0.055);
+  const Float_t fLblY(0.055);
+  const Float_t fOffX(1.4);
+  const Float_t fOffY(1.5);
+  const Float_t fOffLX(0.005);
+  const Float_t fOffLY(0.005);
+  const Float_t fOffLblNudge(0.001);
   for (UInt_t iGam = 0; iGam < NGam; iGam++) {
     hGam[iGam] -> SetMarkerColor(fColGam[iGam]);
     hGam[iGam] -> SetMarkerStyle(fMarGam[iGam]);
@@ -179,20 +188,28 @@ void MakeSmearingWeightPlotForPaper() {
     hGam[iGam] -> SetLineStyle(fLin);
     hGam[iGam] -> SetFillColor(fColGam[iGam]);
     hGam[iGam] -> SetFillStyle(fFil);
-    hGam[iGam] -> SetTitle(sTitleGam.Data());
+    hGam[iGam] -> SetTitle("");
     hGam[iGam] -> SetTitleFont(fTxt);
     hGam[iGam] -> GetXaxis() -> SetRangeUser(xGamRange[0], xGamRange[1]);
+    hGam[iGam] -> GetXaxis() -> SetNdivisions(nDivX);
+    hGam[iGam] -> GetXaxis() -> SetTickLength(fTickLX);
     hGam[iGam] -> GetXaxis() -> SetLabelFont(fTxt);
-    hGam[iGam] -> GetXaxis() -> SetLabelSize(fLbl);
+    hGam[iGam] -> GetXaxis() -> SetLabelSize(fLblX);
+    hGam[iGam] -> GetXaxis() -> SetLabelOffset(fOffLX);
     hGam[iGam] -> GetXaxis() -> SetTitle(sTitleGamX.Data());
     hGam[iGam] -> GetXaxis() -> SetTitleFont(fTxt);
+    hGam[iGam] -> GetXaxis() -> SetTitleSize(fTtlX);
     hGam[iGam] -> GetXaxis() -> SetTitleOffset(fOffX);
     hGam[iGam] -> GetXaxis() -> CenterTitle(fCnt);
     hGam[iGam] -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+    hGam[iGam] -> GetYaxis() -> SetNdivisions(nDivY);
+    hGam[iGam] -> GetYaxis() -> SetTickLength(fTickLY);
     hGam[iGam] -> GetYaxis() -> SetLabelFont(fTxt);
-    hGam[iGam] -> GetYaxis() -> SetLabelSize(fLbl);
+    hGam[iGam] -> GetYaxis() -> SetLabelSize(fLblY);
+    hGam[iGam] -> GetYaxis() -> SetLabelOffset(fOffLY);
     hGam[iGam] -> GetYaxis() -> SetTitle(sTitleY.Data());
     hGam[iGam] -> GetYaxis() -> SetTitleFont(fTxt);
+    hGam[iGam] -> GetYaxis() -> SetTitleSize(fTtlY);
     hGam[iGam] -> GetYaxis() -> SetTitleOffset(fOffY);
     hGam[iGam] -> GetYaxis() -> CenterTitle(fCnt);
   }
@@ -203,21 +220,28 @@ void MakeSmearingWeightPlotForPaper() {
     hPi0[iPi0] -> SetLineStyle(fLin);
     hPi0[iPi0] -> SetFillColor(fColPi0[iPi0]);
     hPi0[iPi0] -> SetFillStyle(fFil);
-    hPi0[iPi0] -> SetTitle(sTitlePi0.Data());
+    hPi0[iPi0] -> SetTitle("");
     hPi0[iPi0] -> SetTitleFont(fTxt);
     hPi0[iPi0] -> GetXaxis() -> SetRangeUser(xPi0Range[0], xPi0Range[1]);
+    hPi0[iPi0] -> GetXaxis() -> SetNdivisions(nDivX);
+    hPi0[iPi0] -> GetXaxis() -> SetTickLength(fTickLX);
     hPi0[iPi0] -> GetXaxis() -> SetLabelFont(fTxt);
-    hPi0[iPi0] -> GetXaxis() -> SetLabelSize(fLbl);
+    hPi0[iPi0] -> GetXaxis() -> SetLabelSize(fLblX);
+    hPi0[iPi0] -> GetXaxis() -> SetLabelOffset(fOffLX);
     hPi0[iPi0] -> GetXaxis() -> SetTitle(sTitlePi0X.Data());
     hPi0[iPi0] -> GetXaxis() -> SetTitleFont(fTxt);
+    hPi0[iPi0] -> GetXaxis() -> SetTitleSize(fTtlX);
     hPi0[iPi0] -> GetXaxis() -> SetTitleOffset(fOffX);
     hPi0[iPi0] -> GetXaxis() -> CenterTitle(fCnt);
     hPi0[iPi0] -> GetYaxis() -> SetRangeUser(yRange[0], yRange[1]);
+    hPi0[iPi0] -> GetYaxis() -> SetNdivisions(nDivY);
+    hPi0[iPi0] -> GetYaxis() -> SetTickLength(fTickLY);
     hPi0[iPi0] -> GetYaxis() -> SetLabelFont(fTxt);
-    hPi0[iPi0] -> GetYaxis() -> SetLabelSize(fLbl);
-    hPi0[iPi0] -> GetYaxis() -> SetLabelOffset(fOffL);
+    hPi0[iPi0] -> GetYaxis() -> SetLabelSize(fLblY);
+    hPi0[iPi0] -> GetYaxis() -> SetLabelOffset(fOffLY + fOffLblNudge);
     hPi0[iPi0] -> GetYaxis() -> SetTitle(sTitleY.Data());
     hPi0[iPi0] -> GetYaxis() -> SetTitleFont(fTxt);
+    hPi0[iPi0] -> GetYaxis() -> SetTitleSize(fTtlY);
     hPi0[iPi0] -> GetYaxis() -> SetTitleOffset(fOffY);
     hPi0[iPi0] -> GetYaxis() -> CenterTitle(fCnt);
   }
@@ -227,13 +251,9 @@ void MakeSmearingWeightPlotForPaper() {
   const UInt_t  fColLeg      = 0;
   const UInt_t  fLinLeg      = 0;
   const UInt_t  fAlnLeg      = 12;
-  const Float_t hObj         = 0.05;
-  const Float_t hObjG        = hObj * NGam;
-  const Float_t hObjP        = hObj * NPi0;
-  const Float_t yObjG        = 0.1 + hObjG;
-  const Float_t yObjP        = 0.1 + hObjP;
-  const Float_t xyLegG[NVtx] = {0.1, 0.1, 0.3, yObjG};
-  const Float_t xyLegP[NVtx] = {0.1, 0.1, 0.3, yObjP};
+  const Float_t fTxtSizL     = 0.04;
+  const Float_t xyLegG[NVtx] = {0.46, 0.77, 0.80, 0.95};
+  const Float_t xyLegP[NVtx] = {0.46, 0.82, 0.80, 0.95};
 
   TLegend *legGam = new TLegend(xyLegG[0], xyLegG[1], xyLegG[2], xyLegG[3]);
   legGam -> SetLineColor(fColLeg);
@@ -241,9 +261,11 @@ void MakeSmearingWeightPlotForPaper() {
   legGam -> SetFillColor(fColLeg);
   legGam -> SetLineColor(fLinLeg);
   legGam -> SetTextFont(fTxt);
+  legGam -> SetTextSize(fTxtSizL);
   legGam -> SetTextAlign(fAlnLeg);
+  legGam -> AddEntry((TObject*) 0, sTitleGam.Data(), "");
   for (UInt_t iGam = 0; iGam < NGam; iGam++) {
-    legGam -> AddEntry(hGam[iGam], sLegGam[iGam].Data(), "pf");
+    legGam -> AddEntry(hGam[iGam], sLegGam[iGam].Data(), "lp");
   }
 
   TLegend *legPi0 = new TLegend(xyLegP[0], xyLegP[1], xyLegP[2], xyLegP[3]);
@@ -252,16 +274,18 @@ void MakeSmearingWeightPlotForPaper() {
   legPi0 -> SetFillColor(fColLeg);
   legPi0 -> SetLineColor(fLinLeg);
   legPi0 -> SetTextFont(fTxt);
+  legPi0 -> SetTextSize(fTxtSizL);
   legPi0 -> SetTextAlign(fAlnLeg);
+  legPi0 -> AddEntry((TObject*) 0, sTitlePi0.Data(), "");
   for (UInt_t iPi0 = 0; iPi0 < NPi0; iPi0++) {
-    legPi0 -> AddEntry(hPi0[iPi0], sLegPi0[iPi0].Data(), "pf");
+    legPi0 -> AddEntry(hPi0[iPi0], sLegPi0[iPi0].Data(), "lp");
   }
   cout << "    Made legends." << endl;
 
   // make lines
-  const UInt_t  fColOne(923);
+  const UInt_t  fColOne(1);
   const UInt_t  fLinOne(9);
-  const UInt_t  fWidOne(2);
+  const UInt_t  fWidOne(3);
   const Float_t yLine(1.);
 
   TLine *liGam = new TLine(xGamRange[0], yLine, xGamRange[1], yLine);
@@ -275,32 +299,51 @@ void MakeSmearingWeightPlotForPaper() {
   cout << "    Made lines." << endl;
 
   // make plot
-  const UInt_t  width(1900);
-  const UInt_t  height(950);
-  const UInt_t  fMode(0);
-  const UInt_t  fBord(2);
-  const UInt_t  fGrid(0);
-  const UInt_t  fTick(1);
-  const UInt_t  fLogX(0);
-  const UInt_t  fLogY(1);
-  const Float_t fMarginRG(0.015);
-  const Float_t fMarginRP(0.1);
-  const Float_t fMarginLG(0.1);
-  const Float_t fMarginLP(0.015);
+  const UInt_t  padWidth       = 660;
+  const UInt_t  padHeight      = 760;
+  const UInt_t  width          = 2 * padWidth;
+  const UInt_t  height         = padHeight;
+  const UInt_t  fMode          = 0;
+  const UInt_t  fBord          = 2;
+  const UInt_t  fGrid          = 0;
+  const UInt_t  fTick          = 1;
+  const UInt_t  fLogX          = 0;
+  const UInt_t  fLogY          = 11;
+  const UInt_t  fColBord       = 0;
+  const Float_t fMarginT       = 0.05;
+  const Float_t fMarginB       = 0.15;
+  const Float_t fMarginRG      = 0.025;
+  const Float_t fMarginRP      = 0.17;
+  const Float_t fMarginLG      = 0.15;
+  const Float_t fMarginLP      = 0.005;
   const Float_t xyPadGam[NVtx] = {0.,  0., 0.5, 1.};
   const Float_t xyPadPi0[NVtx] = {0.5, 0., 1.,  1.};
 
   TCanvas *cWeight = new TCanvas("cWeights", "", width, height);
   TPad    *pGam    = new TPad("pGam", "", xyPadGam[0], xyPadGam[1], xyPadGam[2], xyPadGam[3]);
   TPad    *pPi0    = new TPad("pPi0", "", xyPadPi0[0], xyPadPi0[1], xyPadPi0[2], xyPadPi0[3]);
+
+  // set canvas options
   cWeight -> SetGrid(fGrid, fGrid);
   cWeight -> SetTicks(fTick, fTick);
   cWeight -> SetBorderMode(fMode);
   cWeight -> SetBorderSize(fBord);
+  cWeight -> SetTopMargin(fMarginT);
+  cWeight -> SetBottomMargin(fMarginB);
+  cWeight -> SetLeftMargin(fMarginLG);
+  cWeight -> SetRightMargin(fMarginRP); 
+  cWeight -> SetLogx(fLogX);
+  cWeight -> SetLogy(fLogY);
+
+  // set pad options
   pGam    -> SetGrid(fGrid, fGrid);
   pGam    -> SetTicks(fTick, fTick);
   pGam    -> SetBorderMode(fMode);
   pGam    -> SetBorderSize(fBord);
+  pGam    -> SetFrameLineColor(fColBord);
+  pGam    -> SetFrameBorderMode(fMode);
+  pGam    -> SetTopMargin(fMarginT);
+  pGam    -> SetBottomMargin(fMarginB);
   pGam    -> SetLeftMargin(fMarginLG);
   pGam    -> SetRightMargin(fMarginRG);
   pGam    -> SetLogx(fLogX);
@@ -309,10 +352,16 @@ void MakeSmearingWeightPlotForPaper() {
   pPi0    -> SetTicks(fTick, fTick);
   pPi0    -> SetBorderMode(fMode);
   pPi0    -> SetBorderSize(fBord);
+  pPi0    -> SetFrameLineColor(fColBord);
+  pPi0    -> SetFrameBorderMode(fMode);
+  pPi0    -> SetTopMargin(fMarginT);
+  pPi0    -> SetBottomMargin(fMarginB);
   pPi0    -> SetLeftMargin(fMarginLP);
   pPi0    -> SetRightMargin(fMarginRP);
   pPi0    -> SetLogx(fLogX);
   pPi0    -> SetLogy(fLogY);
+
+  // make plot
   cWeight -> cd();
   pGam    -> Draw();
   pPi0    -> Draw();
