@@ -23,5 +23,5 @@ Additional macros and scripts which may be useful can be found in the `macros` a
 ```
 starver SL14g
 cons
-./TriggerResolutionStudy_RunThirdmaker.sh
+./TriggerResolutionStudy_RunThirdMaker.sh
 ```
