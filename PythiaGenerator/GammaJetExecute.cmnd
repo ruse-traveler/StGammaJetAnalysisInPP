@@ -1,0 +1,63 @@
+! 'GammaJetExecute.cmnd'
+! Derek Anderson
+! 01.04.2016
+!
+! Input settings for 'GammaJetExecute.cc'. Anything not starting with a letter or number is a comment.
+!
+! Last updated: 07.16.2019
+
+
+! main() settings
+
+Main:numberOfEvents = 100
+Main:timesAllowErrors = 100000
+
+Random:setSeed = on   ! use user-set random seed
+Random:seed = 0       ! seeds event generation based on time [default is -1].
+
+phaseSpace:pTHatMin = 5.   ! minimum invariant pT [default is 0.].
+phaseSpace:pTHatMax = 15.  ! maximum invariant pT [default is -1.].
+
+
+! init(), next(), stat() settings
+
+Init:showChangedSettings = on
+#Init:showChangedParticleData = on
+#Init:showChangedResonanceData = on
+
+Next:numberCount = 500000
+Next:numberShowInfo = 1
+Next:numberShowProcess = 1
+Next:numberShowEvent = 0
+
+Stat:showPartonLevel = on
+
+
+! Beam settings
+
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:eCM = 200.   ! [GeV]
+
+
+! Particle / process settings
+
+#HardQCD:all = on
+PromptPhoton:all = on
+PartonLevel:all = on
+HadronLevel:all = on
+
+111:mayDecay = off   ! pi0 can not decay
+#211:mayDecay = off   ! pi+ can not decay
+
+#PartonLevel:ISR = off   ! initial state radiation
+#PartonLevel:FSR = off   ! final state radiation
+#PartonLevel:MPI = off   ! multiparton interactions
+#BeamRemnants:primordialKT = off   ! include primordial kT
+
+! Tune Settings
+
+#Tune:pp = 5
+
+
+! End

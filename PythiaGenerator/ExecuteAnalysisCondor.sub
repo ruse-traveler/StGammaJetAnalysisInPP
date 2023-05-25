@@ -1,0 +1,19 @@
+# 'ExecuteAnalysisCondor.sub'
+# Derek Anderson
+#
+# Submit this file to perform the gamma+jet
+# analysis via the Condor cluster.
+
+
+executable             = GammaJetExecute.exe
+arguments              = GammaJetExecute.cmnd
+should_transfer_files  = IF_NEEDED
+when_to_transfer_files = ON_EXIT
+initialdir             = ../pTpartonBins/pTpart5_gam/run$(Process)
+transfer_input_files   = GammaJetExecute.cmnd
+log                    = gam.pTpart5sub1.log
+output                 = out.txt
+error                  = err.txt
+notification           = Error
+notify_user            = danderson@comp.tamu.edu
+queue 100
