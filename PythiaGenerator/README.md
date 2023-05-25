@@ -7,7 +7,8 @@ This generates $\pi^{0}$- or $\gamma$-triggered PYTHIA-8 events and saves them i
  - **GammaJetAnalysis.h:** This is the analysis performed on each event. This is the main piece of code where the various trees are filled.
  - **GammaJetSystem.h:** This file contains a bunch of miscellaneous variables and methods which aid in the analysis.
  - **GammaJetHistory.h:** This file contains the definition of the 'history' class. It provides a brief overview of the event, as well as a complete list of particles which participated in the event and some of their properties.
- - **GammaJet$\star$.h:** -- The remaining files contain the definitions of the Event, Trigger, Track, Vertex, and Parton classes used in `GammaJetAnalysis.h`. These are just containers and helper functions to make the analysis code easier to follow / modify.
+ - **GammaJet{Etc}.h:** These contain the definitions of the Event, Trigger, Track, Vertex, and Parton classes used in `GammaJetAnalysis.h`. These are just containers and helper functions to make the analysis code easier to follow / modify.
+ - The remaining files are just small shell scripts that may be useful.
 
 Note that despite all the files being named `GammaJet*`, this module does generate both $\gamma$- *and* $\pi^{0}$-triggered events. The trigger is controlled by uncommenting and commenting the `HardQCD:all = on` and `PromptPhoton:all = on` lines in `GammaJetExecute.cmnd` for $\pi^{0}$ and $\gamma$ triggers respectively. (Make sure *both* aren't commented or uncommented...)
 
@@ -16,11 +17,11 @@ Note that despite all the files being named `GammaJet*`, this module does genera
 If anything *other* than `GammaJetExecute.cmnd` has been modified, recompile the module with
 
 ```
-'make GammaJetExecute'
+make GammaJetExecute
 ```
 
-and the run it with
+and run it with
 
 ```
-./GammaJetExecute.exe GammaJetExecute.cmnd > <outputfile>
+./GammaJetExecute.exe GammaJetExecute.cmnd > <log file>
 ```
