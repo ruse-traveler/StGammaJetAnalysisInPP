@@ -15,6 +15,7 @@
 #include "TFile.h"
 #include "TLine.h"
 #include "TError.h"
+#include "TGraph.h"
 #include "TStyle.h"
 #include "TString.h"
 #include "TLegend.h"
@@ -23,10 +24,12 @@
 using namespace std;
 
 // global constants
-const UInt_t NVtx(4);
-const UInt_t NTxt(5);
-const UInt_t NHist(2);
-const UInt_t NRange(2);
+static const UInt_t NVtx(4);
+static const UInt_t NTxt(5);
+static const UInt_t NVals(2);
+static const UInt_t NHist(2);
+static const UInt_t NRange(2);
+static const UInt_t NBinMax(20);
 
 
 
@@ -38,8 +41,8 @@ void MakeClosureTestPlotForPaper() {
   cout << "\n  Plotting closure test for paper..." << endl;
 
   // io file parameters
-  const TString sIn("closure/et911r02ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r02pi0.d9m2y2022.root");
-  const TString sOut("closureTestForPaper_withAprGpcComments.ffWithRff_pTbinHuge.et911r02pi0.d5m3y2023.root");
+  const TString sIn("closure/et911r05ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r05pi0.d9m2y2022.root");
+  const TString sOut("closureTestForPaper_withDataErrorsAndLowPtCutoff_mayCollabComments.ffWithRff_pTbinHuge.et911r05pi0.d6m7y2023.root");
 
   // io histogram parameters
   const TString sParticle("hParticleWithStat");
@@ -78,16 +81,21 @@ void MakeClosureTestPlotForPaper() {
   const Int_t    yNumBins(1000);
   const Int_t    xBinPtRange[NRange] = {0,         29};
   const Double_t yRange[NRange]      = {0.0000004, 3.};
-  const Double_t rRange[NRange]      = {0.02,      2.8};
+  const Double_t rRange[NRange]      = {0.02,      1.8};
 
   // plot parameters
   const UInt_t   width(700);
   const UInt_t   height(800);
   const Double_t xyTxt[NVtx]   = {0.52, 0.69,  0.79,  0.96};
   const Double_t xyRatio[NVtx] = {0.02, 0.007, 0.917, 0.377};
-  const TString  sTxt[NTxt]    = {"#bf{STAR}", "Closure Test", "anti-k_{T}, R=0.2", "9 < E_{T}^{trig} < 11 GeV", "#pi^{0}+jet"};
+  const TString  sTxt[NTxt]    = {"#bf{STAR}", "Closure Test", "anti-k_{T}, R=0.5", "9 < E_{T}^{trig} < 11 GeV", "#pi^{0}+jet"};
   const TString  sJetTxt("Corrected");
   const TString  sParTxt("PYTHIA");
+
+  // distribution parameters
+  const Bool_t  doLowPtCutoff(true);
+  const Float_t minJetPt(3.);
+  const Float_t maxJetPt(xBinPtRange[1]);
 
   // open files
   TFile *fIn  = new TFile(sIn.Data(),  "read");
@@ -101,32 +109,137 @@ void MakeClosureTestPlotForPaper() {
   cout << "    Opened files." << endl;
 
   // grab input
-  TH1D *hAverage[NHist];
-  TH1D *hRatio[NHist];
+  TH1D *hInAverage[NHist];
+  TH1D *hInRatio[NHist];
   for (UInt_t iHist = 0; iHist < NHist; iHist++) {
-    hAverage[iHist] = (TH1D*) fIn -> Get(sAverage[iHist].Data());
-    hRatio[iHist]   = (TH1D*) fIn -> Get(sRatio[iHist].Data());
-    if (!hAverage[iHist] || !hRatio[iHist]) {
+    hInAverage[iHist] = (TH1D*) fIn -> Get(sAverage[iHist].Data());
+    hInRatio[iHist]   = (TH1D*) fIn -> Get(sRatio[iHist].Data());
+    if (!hInAverage[iHist] || !hInRatio[iHist]) {
       cerr << "PANIC: couldn't grab an input histogram!\n"
-           << "       hAverage[" << iHist << "] = " << hAverage[iHist] << ", hRatio[" << iHist << "] = " << hRatio[iHist] << "\n"
+           << "       hAverage[" << iHist << "] = " << hInAverage[iHist] << ", hRatio[" << iHist << "] = " << hInRatio[iHist] << "\n"
            << endl;
       return;
     }
+  }
+
+  TH1D *hInParticle = (TH1D*) fIn -> Get(sParticle.Data());
+  if (!hInParticle) {
+    cerr << "PANIC: couldn't grab input particle histogram!\n" << endl;
+    return;
+  }
+  cout << "    Grabbed histograms." << endl;
+
+  // copy input to output histograms
+  TH1D *hParticle;
+  TH1D *hAverage[NHist];
+  TH1D *hRatio[NHist];
+
+  hParticle = (TH1D*) hInParticle -> Clone();
+  for (UInt_t iHist = 0; iHist < NHist; iHist++) {
+    hAverage[iHist] = (TH1D*) hInAverage[iHist] -> Clone();
+    hRatio[iHist]   = (TH1D*) hInRatio[iHist]   -> Clone();
+  }
+
+  UInt_t   nBinToDrawPar;
+  UInt_t   nBinToDrawAvg[NHist];
+  UInt_t   nBinToDrawRat[NHist];
+  Double_t xyPar[NVals][NBinMax];
+  Double_t xyAvg[NHist][NVals][NBinMax];
+  Double_t xyRat[NHist][NVals][NBinMax];
+
+  // get no. of bins
+  const UInt_t nBinsPar = hParticle   -> GetNbinsX();
+  const UInt_t nBinsAvg = hAverage[0] -> GetNbinsX();
+  const UInt_t nBinsRat = hRatio[0]   -> GetNbinsX();
+
+  nBinToDrawPar = 0;
+  for (UInt_t iBin = 0; iBin < NBinMax; iBin++) {
+    xyPar[0][iBin] = 0.;
+    xyPar[1][iBin] = 0.;
+  }
+  for (UInt_t iHist = 0; iHist < NHist; iHist++) {
+    nBinToDrawAvg[iHist] = 0;
+    nBinToDrawRat[iHist] = 0;
+    for (UInt_t iBin = 0; iBin < NBinMax; iBin++) {
+      xyAvg[iHist][0][iBin] = 0.;
+      xyAvg[iHist][1][iBin] = 0.;
+      xyRat[iHist][0][iBin] = 0.;
+      xyRat[iHist][1][iBin] = 0.;
+    }
+  }
+
+  // apply low pt cutoff (if needed)
+  if (doLowPtCutoff) {
+
+    // apply cutoff to particle spectrum
+    hParticle -> Reset("ICES");
+    for (UInt_t iBinPar = 1; iBinPar < (nBinsPar + 1); iBinPar++) {
+      const Double_t binCenterPar = hInParticle -> GetBinCenter(iBinPar);
+      const Double_t binValuePar  = hInParticle -> GetBinContent(iBinPar);
+      const Double_t binErrorPar  = hInParticle -> GetBinError(iBinPar);
+      if ((binCenterPar >= minJetPt) && (binCenterPar < maxJetPt)) {
+
+        // set histogram values
+        hParticle -> SetBinContent(iBinPar, binValuePar);
+        hParticle -> SetBinError(iBinPar,   binErrorPar);
+
+        // store values
+        xyPar[0][nBinToDrawPar] = binCenterPar;
+        xyPar[1][nBinToDrawPar] = binValuePar;
+        ++nBinToDrawPar;
+      }
+    }  // end particle bin loop
+
+    // apply cutoff to averages and ratios
+    for (UInt_t iHist = 0; iHist < NHist; iHist++) {
+      hAverage[iHist] -> Reset("ICES");
+      hRatio[iHist]   -> Reset("ICES");
+      for (UInt_t iBinAvg = 1; iBinAvg < (nBinsAvg + 1); iBinAvg++) {
+        const Double_t binCenterAvg = hInAverage[iHist] -> GetBinCenter(iBinAvg);
+        const Double_t binValueAvg  = hInAverage[iHist] -> GetBinContent(iBinAvg);
+        const Double_t binErrorAvg  = hInAverage[iHist] -> GetBinError(iBinAvg);
+        if ((binCenterAvg >= minJetPt) && (binCenterAvg < maxJetPt)) {
+
+          // set histogram values
+          hAverage[iHist] -> SetBinContent(iBinAvg, binValueAvg);
+          hAverage[iHist] -> SetBinError(iBinAvg,   binErrorAvg);
+
+          // store values
+          xyAvg[iHist][0][nBinToDrawAvg[iHist]] = binCenterAvg;
+          xyAvg[iHist][1][nBinToDrawAvg[iHist]] = binValueAvg;
+          ++nBinToDrawAvg[iHist];
+        }
+      }  // end average bin loop
+      for (UInt_t iBinRat = 1; iBinRat < (nBinsRat + 1); iBinRat++) {
+        const Double_t binCenterRat = hInRatio[iHist] -> GetBinCenter(iBinRat);
+        const Double_t binValueRat  = hInRatio[iHist] -> GetBinContent(iBinRat);
+        const Double_t binErrorRat  = hInRatio[iHist] -> GetBinError(iBinRat);
+        if ((binCenterRat >= minJetPt) && (binCenterRat < maxJetPt)) {
+
+          // set histogram values
+          hRatio[iHist] -> SetBinContent(iBinRat, binValueRat);
+          hRatio[iHist] -> SetBinError(iBinRat,   binErrorRat);
+
+          // store values
+          xyRat[iHist][0][nBinToDrawRat[iHist]] = binCenterRat;
+          xyRat[iHist][1][nBinToDrawRat[iHist]] = binValueRat;
+          ++nBinToDrawRat[iHist];
+        }
+      }  // end average bin loop
+    }  // end histogram loop
+    cout << "    Cut off spectra at low pt." << endl;
+  }  // end low pt cutoff
+
+  // set histogram names
+  hParticle -> SetName(sNamePar.Data());
+  for (UInt_t iHist = 0; iHist < NHist; iHist++) {
     hAverage[iHist] -> SetName(sNameAvg[iHist].Data());
     hRatio[iHist]   -> SetName(sNameRat[iHist].Data());
   }
 
-  TH1D *hParticle = (TH1D*) fIn -> Get(sParticle.Data());
-  if (!hParticle) {
-    cerr << "PANIC: couldn't gran input particle histogram!\n" << endl;
-    return;
-  }
-  hParticle -> SetName(sNamePar.Data());
-  cout << "    Grabbed histograms." << endl;
-
   // set styles
-  hParticle   -> SetLineColor(fColPar);
-  hParticle   -> SetLineStyle(fLinPar);
+  hParticle -> SetLineColor(fColPar);
+  hParticle -> SetLineStyle(fLinPar);
   for (UInt_t iHist = 0; iHist < NHist; iHist++) {
     hAverage[iHist] -> SetMarkerColor(fColAvg[iHist]);
     hAverage[iHist] -> SetMarkerStyle(fMarAvg);
@@ -224,11 +337,27 @@ void MakeClosureTestPlotForPaper() {
   legTxt -> AddEntry(hParticle,    sParTxt.Data(), "l");
   cout << "    Made text boxes." << endl;
 
-  // make line
+  // make lines
   TLine *lUnity = new TLine(xBinPtRange[0], 1., xBinPtRange[1], 1.);
   lUnity -> SetLineColor(1);
   lUnity -> SetLineStyle(2);
-  cout << "    Made line." << endl;
+
+  TGraph *gParticle = new TGraph(nBinToDrawPar, xyPar[0], xyPar[1]);
+  gParticle -> SetName("gParticle");
+  gParticle -> SetLineColor(fColPar);
+  gParticle -> SetLineStyle(fLinPar);
+
+  TGraph *gAverage = new TGraph(nBinToDrawAvg[0], xyAvg[0][0], xyAvg[0][1]);
+  TGraph *gRatio   = new TGraph(nBinToDrawRat[0], xyRat[0][0], xyRat[0][1]);
+  gAverage -> SetName("gParticle");
+  gAverage -> SetLineColor(fColAvg[0]);
+  gAverage -> SetLineStyle(fLinAvg[0]);
+  gAverage -> SetLineWidth(fWidAvg[0]);
+  gRatio   -> SetName("gRatio");
+  gRatio   -> SetLineColor(fColRat[0]);
+  gRatio   -> SetLineStyle(fLinRat[0]);
+  gRatio   -> SetLineWidth(fWidRat[0]);
+  cout << "    Made lines." << endl;
 
   // make canvas
   TCanvas *cPlot = new TCanvas("cPlot", "canvas", width, height);
@@ -248,9 +377,14 @@ void MakeClosureTestPlotForPaper() {
   hFrameJets  -> DrawCopy("9");
   hAvgOutline -> Draw("E5 SAME");
   hAverage[1] -> Draw("E5 SAME");
-  hAverage[0] -> Draw("][ L HIST SAME");
-  hParticle   -> Draw("][ L HIST SAME");
-  legTxt      -> Draw("SAME");
+  if (doLowPtCutoff) {
+    gAverage  -> Draw("L");
+    gParticle -> Draw("L");
+  } else {
+    hAverage[0] -> Draw("][ L HIST SAME");
+    hParticle   -> Draw("][ L HIST SAME");
+  }
+  legTxt -> Draw("SAME");
 
   // create pad for ratio
   TPad *pRatio = new TPad("pRatio", "pRatio", xyRatio[0], xyRatio[1], xyRatio[2], xyRatio[3]);
@@ -270,11 +404,15 @@ void MakeClosureTestPlotForPaper() {
   hFrameRatio -> DrawCopy("9");
   hRatOutline -> Draw("E5 SAME");
   hRatio[1]   -> Draw("E5 SAME");
-  hRatio[0]   -> Draw("][ L HIST SAME");
-  lUnity      -> Draw();
-  fOut        -> cd();
-  cPlot       -> Write();
-  cPlot       -> Close();
+  if (doLowPtCutoff) {
+    gRatio -> Draw("L");
+  } else {
+    hRatio[0] -> Draw("][ L HIST SAME");
+  }
+  lUnity -> Draw();
+  fOut   -> cd();
+  cPlot  -> Write();
+  cPlot  -> Close();
   cout << "    Made plot." << endl;
 
   // save histograms
@@ -284,6 +422,11 @@ void MakeClosureTestPlotForPaper() {
     hRatio[iHist]   -> Write();
   }
   hParticle   -> Write();
+  if (doLowPtCutoff) {
+    gParticle -> Write();
+    gAverage  -> Write();
+    gRatio    -> Write();
+  }
   hAvgOutline -> Write();
   hRatOutline -> Write();
   hAvgLegend  -> Write();
