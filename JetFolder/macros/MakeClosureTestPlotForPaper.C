@@ -30,6 +30,8 @@ static const UInt_t NTxt(5);
 static const UInt_t NVals(2);
 static const UInt_t NHist(2);
 static const UInt_t NRange(2);
+static const UInt_t NPoints(10);
+static const UInt_t NFields(6);
 static const UInt_t NBinMax(20);
 
 
@@ -43,7 +45,7 @@ void MakeClosureTestPlotForPaper() {
 
   // io file parameters
   const TString sIn("closure/et911r05ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r05pi0.d9m2y2022.root");
-  const TString sOut("closureTestForPaper_withDataErrorsAndLowPtCutoff_mayCollabComments.ffWithRff_pTbinHuge.et911r05pi0.d7m7y2023.root");
+  const TString sOut("closureTestForPaper_withActualDataErrorsAndLowPtCutoff_mayCollabComments.ffWithRff_pTbinHuge.et911r05pi0.d9m7y2023.root");
 
   // io histogram parameters
   const TString sParticle("hParticleWithStat");
@@ -110,9 +112,37 @@ void MakeClosureTestPlotForPaper() {
 
   // distribution parameters
   const Bool_t  doLowPtCutoff(true);
+  const Bool_t  useDataErrors(true);
   const Bool_t  showTruthError(true);
+  const UInt_t  fDataset(1);
   const Float_t minJetPt(3.);
   const Float_t maxJetPt(xBinPtRange[1]);
+
+  // data points
+  const Double_t data_et911r02[NPoints][NFields] = {
+    {0.41991, 1.67912,     0.41991,  0.58009, 0.0727417,   0.0727417},
+    {1.41991, 0.565804,    0.41991,  0.58009, 0.0227303,   0.0227303},
+    {2.69355, 0.157091,    0.693549, 1.30645, 0.00952979,  0.00952979},
+    {4.92234, 0.0429032,   0.922344, 1.07766, 0.00197916,  0.00197916},
+    {6.92234, 0.0251721,   0.922344, 1.07766, 0.00126535,  0.00126535},
+    {9.32606, 0.0148911,   1.32606,  1.67394, 0.00101062,  0.00101062},
+    {12.6927, 0.00661861,  1.6927,   2.3073,  0.000567637, 0.000567637},
+    {16.9582, 0.00230692,  1.95822,  3.04178, 0.000276657, 0.000276657},
+    {21.9582, 0.000774539, 1.95822,  3.04178, 0.000182686, 0.000182686},
+    {26.9582, 0.000162226, 1.95822,  3.04178, 4.17115e-05, 4.17115e-05}
+  };
+  const Double_t data_et911r05[NPoints][NFields] = {
+    {0.415792, 1.07316,     0.415792, 0.584208, 0.0423119,   0.0423119},
+    {1.41579,  0.289051,    0.415792, 0.584208, 0.00695692,  0.00695692},
+    {2.67923,  0.0981596,   0.679232, 1.32077,  0.00635806,  0.00635806},
+    {4.94215,  0.0543701,   0.942145, 1.05785,  0.00259349,  0.00259349},
+    {6.94215,  0.038216,    0.942145, 1.05785,  0.00218521,  0.00218521},
+    {9.37015,  0.0251227,   1.37015,  1.62985,  0.00172022,  0.00172022},
+    {12.77,    0.0134148,   1.76996,  2.23004,  0.00136424,  0.00136424},
+    {17.0654,  0.00443086,  2.06537,  2.93463,  0.000670039, 0.000670039},
+    {22.0654,  0.0014075,   2.06537,  2.93463,  0.000339134, 0.000339134},
+    {27.0654,  0.000544651, 2.06537,  2.93463,  0.00029686,  0.00029686}
+  };
 
   // open files
   TFile *fIn  = new TFile(sIn.Data(),  "read");
@@ -172,6 +202,58 @@ void MakeClosureTestPlotForPaper() {
     hRatio[iHist]   = (TH1D*) hInRatio[iHist]   -> Clone();
   }
 
+  // parse dataset selection
+  Double_t dataPoints[NPoints][NFields];
+  for (UInt_t iPoint = 0; iPoint < NPoints; iPoint++) {
+    for (UInt_t iField = 0; iField < NFields; iField++) {
+      switch (fDataset) {
+        case 0:
+          dataPoints[iPoint][iField] = data_et911r02[iPoint][iField];
+          break;
+        case 1:
+          dataPoints[iPoint][iField] = data_et911r05[iPoint][iField];
+          break;
+        default:
+          dataPoints[iPoint][iField] = data_et911r02[iPoint][iField];
+          break;
+      }
+    }  // end field loop
+  }  // end point loop
+
+  // get no. of bins
+  const UInt_t nBinsPar = hInParticle   -> GetNbinsX();
+  const UInt_t nBinsAvg = hInAverage[0] -> GetNbinsX();
+  const UInt_t nBinsRat = hInRatio[0]   -> GetNbinsX();
+
+  UInt_t nBinsUni = 0;
+  if (showTruthError) {
+    nBinsUni = hInUnity -> GetNbinsX();
+  }
+
+  // adjust particle-level errors if needed
+  if (useDataErrors) {
+    for (UInt_t iBinPar = 0; iBinPar < nBinsPar; iBinPar++) {
+
+      // get particle-level info
+      const Double_t binCenterPar = hInParticle -> GetBinCenter(iBinPar);
+      const Double_t binValuePar  = hInParticle -> GetBinContent(iBinPar);
+
+      // get relevant datapoint
+      for (UInt_t iPoint = 0; iPoint < NPoints; iPoint++) {
+        const Double_t binLowEdgeDat  = dataPoints[iPoint][0] - dataPoints[iPoint][2];
+        const Double_t binHighEdgeDat = dataPoints[iPoint][0] + dataPoints[iPoint][3];
+        const Double_t binFracDat     = dataPoints[iPoint][4] / dataPoints[iPoint][1];
+        const Bool_t   isInDataBin    = ((binCenterPar >= binLowEdgeDat) && (binCenterPar < binHighEdgeDat));
+        if (isInDataBin && (dataPoints[iPoint][1] > 0.)) {
+          hInParticle -> SetBinError(iBinPar, binFracDat * binValuePar);
+          hInUnity    -> SetBinError(iBinPar, binFracDat);
+          break;
+        }
+      }  // end point loop
+    }  // end particle bin loop
+    cout << "    Adjusted particle-level errors." << endl;
+  }  // end error adjustment
+
   UInt_t   nBinToDrawPar;
   UInt_t   nBinToDrawAvg[NHist];
   UInt_t   nBinToDrawRat[NHist];
@@ -179,16 +261,6 @@ void MakeClosureTestPlotForPaper() {
   Double_t xyErr[NVals][NBinMax];
   Double_t xyAvg[NHist][NVals][NBinMax];
   Double_t xyRat[NHist][NVals][NBinMax];
-
-  // get no. of bins
-  const UInt_t nBinsPar = hParticle   -> GetNbinsX();
-  const UInt_t nBinsAvg = hAverage[0] -> GetNbinsX();
-  const UInt_t nBinsRat = hRatio[0]   -> GetNbinsX();
-
-  UInt_t nBinsUni = 0;
-  if (showTruthError) {
-    nBinsUni = hUnity -> GetNbinsX();
-  }
 
   nBinToDrawPar = 0;
   for (UInt_t iBin = 0; iBin < NBinMax; iBin++) {
