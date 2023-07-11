@@ -13,6 +13,7 @@
 #include "TH2.h"
 #include "TPad.h"
 #include "TFile.h"
+#include "TMath.h"
 #include "TLine.h"
 #include "TError.h"
 #include "TGraph.h"
@@ -45,7 +46,7 @@ void MakeClosureTestPlotForPaper() {
 
   // io file parameters
   const TString sIn("closure/et911r05ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r05pi0.d9m2y2022.root");
-  const TString sOut("closureTestForPaper_withActualDataErrorsAndLowPtCutoff_mayCollabComments.ffWithRff_pTbinHuge.et911r05pi0.d9m7y2023.root");
+  const TString sOut("closureTestForPaper_totErrorOnlyOnUnity.ffWithRff_pTbinHuge.et911r05pi0.d10m7y2023.root");
 
   // io histogram parameters
   const TString sParticle("hParticleWithStat");
@@ -63,7 +64,7 @@ void MakeClosureTestPlotForPaper() {
   // style parameters
   const TString sTitleX("p_{T,jet}^{ch} [GeV/#it{c}]");
   const TString sTitleY("1/N_{trig} dN^{2}_{jets}/(dp_{T,jet}^{reco,ch} d#eta_{jet}) [GeV/#it{c}]^{-1}");
-  const TString sTitleR("#frac{Corrected}{PYTHIA}");
+  const TString sTitleR("Ratio to PYTHIA");
   const UInt_t  fColPar(635);
   const UInt_t  fColErr(622);
   const UInt_t  fColUni(622);
@@ -99,27 +100,32 @@ void MakeClosureTestPlotForPaper() {
   const Int_t    yNumBins(1000);
   const Int_t    xBinPtRange[NRange] = {0,         29};
   const Double_t yRange[NRange]      = {0.0000004, 3.};
-  const Double_t rRange[NRange]      = {0.02,      1.8};
+  //const Double_t rRange[NRange]      = {0.02,      1.8};
+  const Double_t rRange[NRange]      = {0.37,      2.37};
 
   // plot parameters
   const UInt_t   width(700);
   const UInt_t   height(800);
-  const Double_t xyTxt[NVtx]   = {0.52, 0.69,  0.79,  0.96};
-  const Double_t xyRatio[NVtx] = {0.02, 0.007, 0.917, 0.377};
-  const TString  sTxt[NTxt]    = {"#bf{STAR}", "Closure Test", "anti-k_{T}, R=0.5", "9 < E_{T}^{trig} < 11 GeV", "#pi^{0}+jet"};
-  const TString  sJetTxt("Corrected");
+  const Double_t xyLegUp[NVtx]    = {0.52, 0.69,  0.79,  0.96};  // 0.27 height, 0.27 width
+  const Double_t xyLegDown[NVtx]  = {0.52, 0.69,  0.82,  0.93};  // (1/3) of the up lines => 0.09 =(scale by 37%)=> 0.24 height, =(scale by 89.7%)=> 0.30
+  const Double_t xyPadRatio[NVtx] = {0.02, 0.007, 0.917, 0.377};  // 37% the height of the canvas, 89.7% the width of the canvas
+  const TString  sTxt[NTxt]       = {"#bf{STAR}", "Closure Test", "anti-k_{T}, R=0.5", "9 < E_{T}^{trig} < 11 GeV", "#pi^{0}+jet"};
+  const TString  sJetTxt("Unfolded");
   const TString  sParTxt("PYTHIA");
+  const TString  sUniTxt("Data uncertainty");
 
   // distribution parameters
   const Bool_t  doLowPtCutoff(true);
-  const Bool_t  useDataErrors(true);
-  const Bool_t  showTruthError(true);
+  const Bool_t  showUnityError(true);
+  const Bool_t  showPythiaError(false);
+  const Bool_t  putDataErrorsOnUnity(true);
+  const Bool_t  putDataErrorsOnPythia(false);
   const UInt_t  fDataset(1);
   const Float_t minJetPt(3.);
   const Float_t maxJetPt(xBinPtRange[1]);
 
   // data points
-  const Double_t data_et911r02[NPoints][NFields] = {
+  const Double_t sysData_et911r02[NPoints][NFields] = {
     {0.41991, 1.67912,     0.41991,  0.58009, 0.0727417,   0.0727417},
     {1.41991, 0.565804,    0.41991,  0.58009, 0.0227303,   0.0227303},
     {2.69355, 0.157091,    0.693549, 1.30645, 0.00952979,  0.00952979},
@@ -131,7 +137,19 @@ void MakeClosureTestPlotForPaper() {
     {21.9582, 0.000774539, 1.95822,  3.04178, 0.000182686, 0.000182686},
     {26.9582, 0.000162226, 1.95822,  3.04178, 4.17115e-05, 4.17115e-05}
   };
-  const Double_t data_et911r05[NPoints][NFields] = {
+  const Double_t statData_et911r02[NPoints][NFields] = {
+    {0.419903, 1.67912,     0.419903, 0.580097, 0.0103549,   0.0103549},
+    {1.4199,   0.565804,    0.419903, 0.580097, 0.00601886,  0.00601886},
+    {2.69352,  0.157091,    0.693524, 1.30648,  0.00232342,  0.00232342},
+    {4.92234,  0.0429032,   0.922337, 1.07766,  0.00129114,  0.00129114},
+    {6.92234,  0.0251721,   0.922337, 1.07766,  0.00103774,  0.00103774},
+    {9.32604,  0.0148911,   1.32604,  1.67396,  0.000656481, 0.000656481},
+    {12.6927,  0.00661861,  1.69267,  2.30733,  0.000376287, 0.000376287},
+    {16.9582,  0.00230692,  1.95824,  3.04176,  0.00020196,  0.00020196},
+    {21.9582,  0.000774539, 1.95824,  3.04176,  0.000112017, 0.000112017},
+    {26.9582,  0.000162226, 1.95824,  3.04176,  4.83076e-05, 4.83076e-05}
+  };
+  const Double_t sysData_et911r05[NPoints][NFields] = {
     {0.415792, 1.07316,     0.415792, 0.584208, 0.0423119,   0.0423119},
     {1.41579,  0.289051,    0.415792, 0.584208, 0.00695692,  0.00695692},
     {2.67923,  0.0981596,   0.679232, 1.32077,  0.00635806,  0.00635806},
@@ -142,6 +160,18 @@ void MakeClosureTestPlotForPaper() {
     {17.0654,  0.00443086,  2.06537,  2.93463,  0.000670039, 0.000670039},
     {22.0654,  0.0014075,   2.06537,  2.93463,  0.000339134, 0.000339134},
     {27.0654,  0.000544651, 2.06537,  2.93463,  0.00029686,  0.00029686}
+  };
+  const Double_t statData_et911r05[NPoints][NFields] = {
+    {0.415807, 1.07316,     0.415807, 0.584193, 0.0169683,   0.0169683},
+    {1.41581,  0.289051,    0.415807, 0.584193, 0.00670517,  0.00670517},
+    {2.67928,  0.0981596,   0.679283, 1.32072,  0.00253153,  0.00253153},
+    {4.94214,  0.0543701,   0.942141, 1.05786,  0.00180289,  0.00180289},
+    {6.94214,  0.038216,    0.942141, 1.05786,  0.00148595,  0.00148595},
+    {9.37014,  0.0251227,   1.37014,  1.62986,  0.000988172, 0.000988172},
+    {12.7699,  0.0134148,   1.76995,  2.23005,  0.000616403, 0.000616403},
+    {17.0693,  0.00443086,  2.06935,  2.93065,  0.000302308, 0.000302308},
+    {22.0693,  0.0014075,   2.06935,  2.93065,  0.000162512, 0.000162512},
+    {27.0693,  0.000544651, 2.06935,  2.93065,  0.000105142, 0.000105142}
   };
 
   // open files
@@ -176,7 +206,7 @@ void MakeClosureTestPlotForPaper() {
   }
 
   TH1D *hInUnity;
-  if (showTruthError) {
+  if (showUnityError) {
     hInUnity = (TH1D*) fIn -> Get(sParUnity.Data());
     if (!hInUnity) {
       cerr << "PANIC: couldn't grab input unity histogram!\n" << endl;
@@ -193,31 +223,52 @@ void MakeClosureTestPlotForPaper() {
   TH1D *hRatio[NHist];
 
   hParticle = (TH1D*) hInParticle -> Clone();
-  if (showTruthError) {
-    hParError = (TH1D*) hInParticle -> Clone();
-    hUnity    = (TH1D*) hInUnity    -> Clone();
-  }
   for (UInt_t iHist = 0; iHist < NHist; iHist++) {
     hAverage[iHist] = (TH1D*) hInAverage[iHist] -> Clone();
     hRatio[iHist]   = (TH1D*) hInRatio[iHist]   -> Clone();
   }
+  if (showUnityError)  hUnity    = (TH1D*) hInUnity    -> Clone();
+  if (showPythiaError) hParError = (TH1D*) hInParticle -> Clone();
 
   // parse dataset selection
-  Double_t dataPoints[NPoints][NFields];
+  Double_t sysDataPoints[NPoints][NFields];
+  Double_t statDataPoints[NPoints][NFields];
   for (UInt_t iPoint = 0; iPoint < NPoints; iPoint++) {
     for (UInt_t iField = 0; iField < NFields; iField++) {
       switch (fDataset) {
         case 0:
-          dataPoints[iPoint][iField] = data_et911r02[iPoint][iField];
+          sysDataPoints[iPoint][iField]  = sysData_et911r02[iPoint][iField];
+          statDataPoints[iPoint][iField] = statData_et911r02[iPoint][iField];
           break;
         case 1:
-          dataPoints[iPoint][iField] = data_et911r05[iPoint][iField];
+          sysDataPoints[iPoint][iField]  = sysData_et911r05[iPoint][iField];
+          statDataPoints[iPoint][iField] = statData_et911r05[iPoint][iField];
           break;
         default:
-          dataPoints[iPoint][iField] = data_et911r02[iPoint][iField];
+          sysDataPoints[iPoint][iField]  = sysData_et911r02[iPoint][iField];
+          statDataPoints[iPoint][iField] = statData_et911r02[iPoint][iField];
           break;
       }
     }  // end field loop
+  }  // end point loop
+
+  // calculate total data error
+  Double_t totDataPoints[NPoints][NFields];
+  for (UInt_t iPoint = 0; iPoint < NPoints; iPoint++) {
+
+    // add errors in quadrature
+    const Double_t sysFracErr  = sysDataPoints[iPoint][4]  / sysDataPoints[iPoint][1];
+    const Double_t statFracErr = statDataPoints[iPoint][4] / statDataPoints[iPoint][1];
+    const Double_t totFracErr  = TMath::Sqrt((sysFracErr * sysFracErr) + (statFracErr * statFracErr));
+    const Double_t totErr      = totFracErr * sysDataPoints[iPoint][1];
+
+    // set total data points
+    totDataPoints[iPoint][0] = sysDataPoints[iPoint][0];
+    totDataPoints[iPoint][1] = sysDataPoints[iPoint][1];
+    totDataPoints[iPoint][2] = sysDataPoints[iPoint][2];
+    totDataPoints[iPoint][3] = sysDataPoints[iPoint][3];
+    totDataPoints[iPoint][4] = totErr;
+    totDataPoints[iPoint][5] = totErr;
   }  // end point loop
 
   // get no. of bins
@@ -226,11 +277,12 @@ void MakeClosureTestPlotForPaper() {
   const UInt_t nBinsRat = hInRatio[0]   -> GetNbinsX();
 
   UInt_t nBinsUni = 0;
-  if (showTruthError) {
+  if (showUnityError) {
     nBinsUni = hInUnity -> GetNbinsX();
   }
 
   // adjust particle-level errors if needed
+  const Bool_t useDataErrors = (putDataErrorsOnUnity || putDataErrorsOnPythia);
   if (useDataErrors) {
     for (UInt_t iBinPar = 0; iBinPar < nBinsPar; iBinPar++) {
 
@@ -240,13 +292,13 @@ void MakeClosureTestPlotForPaper() {
 
       // get relevant datapoint
       for (UInt_t iPoint = 0; iPoint < NPoints; iPoint++) {
-        const Double_t binLowEdgeDat  = dataPoints[iPoint][0] - dataPoints[iPoint][2];
-        const Double_t binHighEdgeDat = dataPoints[iPoint][0] + dataPoints[iPoint][3];
-        const Double_t binFracDat     = dataPoints[iPoint][4] / dataPoints[iPoint][1];
+        const Double_t binLowEdgeDat  = totDataPoints[iPoint][0] - totDataPoints[iPoint][2];
+        const Double_t binHighEdgeDat = totDataPoints[iPoint][0] + totDataPoints[iPoint][3];
+        const Double_t binFracDat     = totDataPoints[iPoint][4] / totDataPoints[iPoint][1];
         const Bool_t   isInDataBin    = ((binCenterPar >= binLowEdgeDat) && (binCenterPar < binHighEdgeDat));
-        if (isInDataBin && (dataPoints[iPoint][1] > 0.)) {
-          hInParticle -> SetBinError(iBinPar, binFracDat * binValuePar);
-          hInUnity    -> SetBinError(iBinPar, binFracDat);
+        if (isInDataBin && (totDataPoints[iPoint][1] > 0.)) {
+          if (putDataErrorsOnUnity)  hInUnity    -> SetBinError(iBinPar, binFracDat);
+          if (putDataErrorsOnPythia) hInParticle -> SetBinError(iBinPar, binFracDat * binValuePar);
           break;
         }
       }  // end point loop
@@ -306,7 +358,7 @@ void MakeClosureTestPlotForPaper() {
     }  // end particle bin loop
 
     // apply cutoff to unity histogram
-    if (showTruthError) {
+    if (showUnityError) {
 
       hUnity -> Reset("ICES");
       for (UInt_t iBinUni = 1; iBinUni < (nBinsUni + 1); iBinUni++) {
@@ -363,24 +415,22 @@ void MakeClosureTestPlotForPaper() {
 
   // set histogram names
   hParticle -> SetName(sNamePar.Data());
-  if (showTruthError) {
-    hParError -> SetName(sNameParError.Data());
-    hUnity    -> SetName(sNameUnity.Data());
-  }
   for (UInt_t iHist = 0; iHist < NHist; iHist++) {
     hAverage[iHist] -> SetName(sNameAvg[iHist].Data());
     hRatio[iHist]   -> SetName(sNameRat[iHist].Data());
   }
+  if (showUnityError)  hUnity    -> SetName(sNameUnity.Data());
+  if (showPythiaError) hParError -> SetName(sNameParError.Data());
 
   // set styles
-  hParticle -> SetMarkerColor(fColPar);
-  hParticle -> SetMarkerStyle(fMarPar);
-  hParticle -> SetLineColor(fColPar);
-  hParticle -> SetLineStyle(fLinPar);
-  hParticle -> SetLineWidth(fWidPar);
-  hParticle -> SetFillColor(fColPar);
-  hParticle -> SetFillStyle(fFilPar);
-  if (showTruthError) {
+  if (showPythiaError) {
+    hParticle -> SetMarkerColor(fColPar);
+    hParticle -> SetMarkerStyle(fMarPar);
+    hParticle -> SetLineColor(fColPar);
+    hParticle -> SetLineStyle(fLinPar);
+    hParticle -> SetLineWidth(fWidPar);
+    hParticle -> SetFillColor(fColPar);
+    hParticle -> SetFillStyle(fFilPar);
     hParError -> SetMarkerColor(fColErr);
     hParError -> SetMarkerStyle(fMarErr);
     hParError -> SetLineColor(fColErr);
@@ -388,13 +438,23 @@ void MakeClosureTestPlotForPaper() {
     hParError -> SetLineWidth(fWidErr);
     hParError -> SetFillColor(fColErr);
     hParError -> SetFillStyle(fFilErr);
-    hUnity    -> SetMarkerColor(fColUni);
-    hUnity    -> SetMarkerStyle(fMarUni);
-    hUnity    -> SetLineColor(fColUni);
-    hUnity    -> SetLineStyle(fLinUni);
-    hUnity    -> SetLineWidth(fWidUni);
-    hUnity    -> SetFillColor(fColUni);
-    hUnity    -> SetFillStyle(fFilUni);
+  } else {
+    hParticle -> SetMarkerColor(fColPar);
+    hParticle -> SetMarkerStyle(fMarPar);
+    hParticle -> SetLineColor(fColPar);
+    hParticle -> SetLineStyle(fLinPar);
+    hParticle -> SetLineWidth(fWidPar);
+    hParticle -> SetFillColor(fColPar);
+    hParticle -> SetFillStyle(fFilPar);
+  }
+  if (showUnityError) {
+    hUnity -> SetMarkerColor(fColUni);
+    hUnity -> SetMarkerStyle(fMarUni);
+    hUnity -> SetLineColor(fColUni);
+    hUnity -> SetLineStyle(fLinUni);
+    hUnity -> SetLineWidth(fWidUni);
+    hUnity -> SetFillColor(fColUni);
+    hUnity -> SetFillStyle(fFilUni);
   }
   for (UInt_t iHist = 0; iHist < NHist; iHist++) {
     hAverage[iHist] -> SetMarkerColor(fColAvg[iHist]);
@@ -455,14 +515,30 @@ void MakeClosureTestPlotForPaper() {
 
   TH1D *hParLegend = (TH1D*) hParticle -> Clone();
   hParLegend -> SetName("hParticleLegend");
-  hParLegend -> SetLineColor(fColPar);
-  hParLegend -> SetLineWidth(fWidPar);
-  if (showTruthError) {
+  if (showPythiaError) {
+    hParLegend -> SetLineColor(fColPar);
+    hParLegend -> SetLineWidth(fWidPar);
     hParLegend -> SetFillColor(fColErr);
     hParLegend -> SetFillStyle(fFilErr);
   } else {
+    hParLegend -> SetLineColor(fColPar);
+    hParLegend -> SetLineWidth(fWidPar);
     hParLegend -> SetFillColor(fColPar);
     hParLegend -> SetFillStyle(fFilPar);
+  }
+
+  TH1D *hUniLegend = (TH1D*) hUnity -> Clone();
+  hUniLegend -> SetName("hUnityLegend");
+  if (showUnityError) {
+    hUniLegend -> SetLineColor(fColPar);
+    hUniLegend -> SetLineWidth(fWidPar);
+    hUniLegend -> SetFillColor(fColErr);
+    hUniLegend -> SetFillStyle(fFilErr);
+  } else {
+    hUniLegend -> SetLineColor(fColPar);
+    hUniLegend -> SetLineWidth(fWidPar);
+    hUniLegend -> SetFillColor(fColPar);
+    hUniLegend -> SetFillStyle(fFilPar);
   }
   cout << "    Made legend histograms." << endl;
 
@@ -476,8 +552,8 @@ void MakeClosureTestPlotForPaper() {
   hFrameJets -> GetYaxis() -> CenterTitle(true);
   hFrameJets -> GetYaxis() -> SetLabelFont(42);
   hFrameJets -> GetYaxis() -> SetLabelSize(0.05);
-  hFrameJets -> GetYaxis() -> SetTitleSize(0.04);
-  hFrameJets -> GetYaxis() -> SetTitleOffset(1.93);
+  hFrameJets -> GetYaxis() -> SetTitleSize(0.035);
+  hFrameJets -> GetYaxis() -> SetTitleOffset(2.2);
   hFrameJets -> GetYaxis() -> SetTitleFont(42);
   hFrameJets -> GetZaxis() -> SetLabelFont(42);
   hFrameJets -> GetZaxis() -> SetLabelSize(0.035);
@@ -490,7 +566,8 @@ void MakeClosureTestPlotForPaper() {
   hFrameRatio -> GetXaxis() -> SetLabelFont(42);
   hFrameRatio -> GetXaxis() -> SetLabelOffset(0.001);
   hFrameRatio -> GetXaxis() -> SetLabelSize(0.14);
-  hFrameRatio -> GetXaxis() -> SetTitleSize(0.14);
+  hFrameRatio -> GetXaxis() -> SetTitleSize(0.1);
+  hFrameRatio -> GetXaxis() -> SetTitleOffset(1.4);
   hFrameRatio -> GetXaxis() -> SetTitleFont(42);
   hFrameRatio -> GetXaxis() -> SetTickLength(0.06);
   hFrameRatio -> GetYaxis() -> SetTickLength(0.04);
@@ -498,9 +575,9 @@ void MakeClosureTestPlotForPaper() {
   hFrameRatio -> GetYaxis() -> CenterTitle(true);
   hFrameRatio -> GetYaxis() -> SetLabelFont(42);
   hFrameRatio -> GetYaxis() -> SetLabelSize(0.12);
-  hFrameRatio -> GetYaxis() -> SetTitleSize(0.1);
+  hFrameRatio -> GetYaxis() -> SetTitleSize(0.09);
   hFrameRatio -> GetYaxis() -> SetNdivisions(505);
-  hFrameRatio -> GetYaxis() -> SetTitleOffset(0.81);
+  hFrameRatio -> GetYaxis() -> SetTitleOffset(0.9);
   hFrameRatio -> GetYaxis() -> SetTitleFont(42);
   hFrameRatio -> GetZaxis() -> SetLabelFont(42);
   hFrameRatio -> GetZaxis() -> SetLabelSize(0.035);
@@ -508,21 +585,31 @@ void MakeClosureTestPlotForPaper() {
   hFrameRatio -> GetZaxis() -> SetTitleFont(42);
   cout << "    Made frame histograms." << endl;
 
-  // make text box
-  TLegend *legTxt = new TLegend(xyTxt[0], xyTxt[1], xyTxt[2], xyTxt[3]);
-  legTxt -> SetTextFont(42);
-  legTxt -> SetTextSize(0.036);  
-  legTxt -> SetFillColor(0);   
-  legTxt -> SetLineColor(0);
-  legTxt -> AddEntry((TObject*) 0, sTxt[0].Data(), "");
-  legTxt -> AddEntry((TObject*) 0, sTxt[1].Data(), "");
-  legTxt -> AddEntry((TObject*) 0, sTxt[2].Data(), "");
-  legTxt -> AddEntry((TObject*) 0, sTxt[3].Data(), "");
-  legTxt -> AddEntry(hAvgLegend,   sJetTxt.Data(), "f");
-  if (showTruthError) {
-    legTxt -> AddEntry(hParLegend, sParTxt.Data(), "lf");
+  // make text boxes
+  TLegend *legTxtUp = new TLegend(xyLegUp[0], xyLegUp[1], xyLegUp[2], xyLegUp[3]);
+  legTxtUp -> SetTextFont(42);
+  legTxtUp -> SetTextSize(0.036);  
+  legTxtUp -> SetFillColor(0);   
+  legTxtUp -> SetLineColor(0);
+  legTxtUp -> AddEntry((TObject*) 0, sTxt[0].Data(), "");
+  legTxtUp -> AddEntry((TObject*) 0, sTxt[1].Data(), "");
+  legTxtUp -> AddEntry((TObject*) 0, sTxt[2].Data(), "");
+  legTxtUp -> AddEntry((TObject*) 0, sTxt[3].Data(), "");
+  legTxtUp -> AddEntry(hAvgLegend,   sJetTxt.Data(), "f");
+  if (showPythiaError) {
+    legTxtUp -> AddEntry(hParLegend, sParTxt.Data(), "lf");
   } else {
-    legTxt -> AddEntry(hParLegend, sParTxt.Data(), "l");
+    legTxtUp -> AddEntry(hParLegend, sParTxt.Data(), "l");
+  }
+
+  TLegend *legTxtDown = new TLegend(xyLegDown[0], xyLegDown[1], xyLegDown[2], xyLegDown[3]);
+  legTxtDown -> SetTextFont(42);
+  legTxtDown -> SetTextSize(0.085);  
+  legTxtDown -> SetFillColor(0);   
+  legTxtDown -> SetLineColor(0);
+  legTxtDown -> AddEntry(hAvgLegend, sJetTxt.Data(), "f");
+  if (showUnityError) {
+    legTxtDown -> AddEntry(hUniLegend, sUniTxt.Data(), "lf");
   }
   cout << "    Made text boxes." << endl;
 
@@ -534,13 +621,23 @@ void MakeClosureTestPlotForPaper() {
   TGraph       *gParticle = new TGraph(nBinToDrawPar, xyPar[0], xyPar[1]);
   TGraphErrors *gParError = new TGraphErrors(nBinToDrawPar, xyPar[0], xyPar[1], xyErr[0], xyErr[1]);
   gParticle -> SetName("gParticle");
-  gParticle -> SetMarkerColor(fColPar);
-  gParticle -> SetMarkerStyle(fMarPar);
-  gParticle -> SetLineColor(fColPar);
-  gParticle -> SetLineStyle(fLinPar);
-  gParticle -> SetLineWidth(fWidPar);
-  gParticle -> SetFillColor(fColPar);
-  gParticle -> SetFillStyle(fFilPar);
+  if (showPythiaError) {
+    gParticle -> SetMarkerColor(fColPar);
+    gParticle -> SetMarkerStyle(fMarPar);
+    gParticle -> SetLineColor(fColPar);
+    gParticle -> SetLineStyle(fLinPar);
+    gParticle -> SetLineWidth(fWidPar);
+    gParticle -> SetFillColor(fColPar);
+    gParticle -> SetFillStyle(fFilPar);
+  } else {
+    gParticle -> SetMarkerColor(fColPar);
+    gParticle -> SetMarkerStyle(fMarPar);
+    gParticle -> SetLineColor(fColPar);
+    gParticle -> SetLineStyle(fLinPar);
+    gParticle -> SetLineWidth(fWidPar);
+    gParticle -> SetFillColor(fColPar);
+    gParticle -> SetFillStyle(fFilPar);
+  }
   gParError -> SetName("gParError");
   gParError -> SetMarkerColor(fColErr);
   gParError -> SetMarkerStyle(fMarErr);
@@ -567,7 +664,7 @@ void MakeClosureTestPlotForPaper() {
   cPlot       -> SetFillColor(0);
   cPlot       -> SetBorderMode(0);
   cPlot       -> SetBorderSize(2);
-  cPlot       -> SetLogy();
+  cPlot       -> SetLogy(1);
   cPlot       -> SetTickx(1);
   cPlot       -> SetTicky(1);
   cPlot       -> SetLeftMargin(0.1794479);
@@ -578,7 +675,7 @@ void MakeClosureTestPlotForPaper() {
   cPlot       -> SetFrameBorderMode(0);
   cPlot       -> cd();
   hFrameJets  -> DrawCopy("9");
-  if (showTruthError) {
+  if (showPythiaError) {
     if (doLowPtCutoff) {
       gParError   -> Draw("3");
       hParOutline -> Draw("E5 SAME");
@@ -607,16 +704,17 @@ void MakeClosureTestPlotForPaper() {
       hParticle   -> Draw("][ L HIST SAME");
     }
   }
-  legTxt -> Draw("SAME");
+  legTxtUp -> Draw("SAME");
 
   // create pad for ratio
-  TPad *pRatio = new TPad("pRatio", "pRatio", xyRatio[0], xyRatio[1], xyRatio[2], xyRatio[3]);
+  TPad *pRatio = new TPad("pRatio", "pRatio", xyPadRatio[0], xyPadRatio[1], xyPadRatio[2], xyPadRatio[3]);
   cPlot       -> cd();
   pRatio      -> Draw();
   pRatio      -> cd();  
   pRatio      -> SetFillColor(0);
   pRatio      -> SetBorderMode(0);
   pRatio      -> SetBorderSize(2);
+  pRatio      -> SetLogy(1);
   pRatio      -> SetTicky(1);
   pRatio      -> SetLeftMargin(0.1784615);
   pRatio      -> SetRightMargin(0.01692308);
@@ -625,7 +723,7 @@ void MakeClosureTestPlotForPaper() {
   pRatio      -> SetFrameBorderMode(0);
   pRatio      -> SetFrameBorderMode(0);
   hFrameRatio -> DrawCopy("9");
-  if (showTruthError) {
+  if (showUnityError) {
     if (doLowPtCutoff) {
       hUnity      -> Draw("E5 SAME");
       hUniOutline -> Draw("E5 SAME");
@@ -650,10 +748,11 @@ void MakeClosureTestPlotForPaper() {
       hRatio[0]   -> Draw("][ L HIST SAME");
     }
   }
-  lUnity -> Draw();
-  fOut   -> cd();
-  cPlot  -> Write();
-  cPlot  -> Close();
+  lUnity     -> Draw();
+  legTxtDown -> Draw();
+  fOut       -> cd();
+  cPlot      -> Write();
+  cPlot      -> Close();
   cout << "    Made plot." << endl;
 
   // save histograms
@@ -663,17 +762,19 @@ void MakeClosureTestPlotForPaper() {
     hRatio[iHist]   -> Write();
   }
   hParticle -> Write();
-  if (showTruthError) {
-    hParError   -> Write();
+  if (showUnityError) {
     hUnity      -> Write();
-    hParOutline -> Write();
     hUniOutline -> Write();
+  }
+  if (showPythiaError) {
+    hParError   -> Write();
+    hParOutline -> Write();
   }
   if (doLowPtCutoff) {
     gParticle -> Write();
     gAverage  -> Write();
     gRatio    -> Write();
-    if (showTruthError) {
+    if (showPythiaError) {
       gParError -> Write();
     }
   }
@@ -681,6 +782,9 @@ void MakeClosureTestPlotForPaper() {
   hRatOutline -> Write();
   hAvgLegend  -> Write();
   hParLegend  -> Write();
+  if (showUnityError) {
+    hUniLegend  -> Write();
+  }
   hFrameJets  -> Write();
   hFrameRatio -> Write();
 
