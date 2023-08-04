@@ -22,14 +22,14 @@ static const TString SParDefault("../JetMaker/mc/output/pp200r9pt15ff.forSmallQt
 static const TString SDetDefault("../JetMaker/mudst/output/pp200r9pt15ff.forSmallQtCheck_withImplicitGhosts_Det.noTrigger.r02rm1chrg.d30m3y2020.root");
 
 // jet parameters
-static const Double_t Rcut(0.2);       // Rcut = Rjet
-static const Double_t MinArea(0.05);   // R02: 0.05, R03: 0.2, R04: 0.35, R05: 0.65, R07: 1.2
+static const Double_t Rcut(0.5);       // Rcut = Rjet
+static const Double_t MinArea(0.65);   // R02: 0.05, R03: 0.2, R04: 0.35, R05: 0.65, R07: 1.2
 static const Double_t MinJetPt(0.2);
 static const Double_t MaxJetPt(30.);   // max detector jet pT
 
 // misc parameters
 static const Bool_t DoNorm(false);
-static const Bool_t UseVariablePtBins(false);
+static const Bool_t UseVariablePtBins(true);
 static const Bool_t UseParticleLevelTrigger(true);
 static const Bool_t UseDetectorLevelTrigger(false);
 static const UInt_t NHadIds(1);
@@ -91,10 +91,15 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
   //const Double_t pTbinsX[30] = {-12., -8., -5., -3., -2., -1.5, -1., -0.6, -0.2, 0., 0.2, 0.6, 1., 1.5, 2., 3., 4., 5., 6.5, 8., 10., 12., 17., 23., 30., 38., 47., 57., 68., 81.};
   //const Double_t pTbinsY[30] = {-12., -8., -5., -3., -2., -1.5, -1., -0.6, -0.2, 0., 0.2, 0.6, 1., 1.5, 2., 3., 4., 5., 6.5, 8., 10., 12., 17., 23., 30., 38., 47., 57., 68., 81.};
   // "huge" variable binning scheme
+  //const UInt_t   nPtBinsX(21);
+  //const UInt_t   nPtBinsY(21);
+  //const Double_t pTbinsX[22] = {-11., -8., -6., -4., -2., -1., 0., 1., 2., 4., 6., 8., 11., 15., 20., 25., 30., 35., 40., 45., 50., 60.};
+  //const Double_t pTbinsY[22] = {-11., -8., -6., -4., -2., -1., 0., 1., 2., 4., 6., 8., 11., 15., 20., 25., 30., 35., 40., 45., 50., 60.};
+  // "giant" variable binning scheme
   const UInt_t   nPtBinsX(21);
   const UInt_t   nPtBinsY(21);
-  const Double_t pTbinsX[22] = {-11., -8., -6., -4., -2., -1., 0., 1., 2., 4., 6., 8., 11., 15., 20., 25., 30., 35., 40., 45., 50., 60.};
-  const Double_t pTbinsY[22] = {-11., -8., -6., -4., -2., -1., 0., 1., 2., 4., 6., 8., 11., 15., 20., 25., 30., 35., 40., 45., 50., 60.};
+  const Double_t pTbinsX[22] = {-12., -9., -7., -5., -3., -2., 1., 2., 3., 5., 7., 9., 11., 14., 19., 24., 29., 34., 39., 44., 49., 61.};
+  const Double_t pTbinsY[22] = {-12., -9., -7., -5., -3., -2., 1., 2., 3., 5., 7., 9., 11., 14., 19., 24., 29., 34., 39., 44., 49., 61.};
 
   // variable qT binning
   const UInt_t   nQtVar(10);
@@ -963,10 +968,8 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
       Double_t bDq    = -999.;
       Double_t bDr    = -999.;
 
-      // TEST [03.26.2020]
-      Int_t bNcst = -999;
-
       // detector jet loop
+      Int_t  bNcst      = -999;
       UInt_t nCandidate = 0;
       Bool_t isMatched  = false;
       for (UInt_t k = 0; k < nDjets; k++) {
@@ -976,7 +979,6 @@ void MatchJets(const TString pPath=SParDefault, const TString dPath=SDetDefault,
         const Double_t dF   = dJetPhi  -> at(k);
         const Double_t dPt  = dJetPt   -> at(k);
         const Double_t dPtc = dPt - (dRho * dA);
-      cout << "CHECK0" << endl;
 
         // calculate delta phi
         Double_t dDf = dF - pTrgPhi;

@@ -28,9 +28,9 @@ static const Double_t WeightsFF[NTotal]  = {1.0, 3.361596e-01, 1.401161e-01, 1.3
 static const Double_t WeightsRFF[NTotal] = {1.0, 3.501425e-01, 1.395103e-01, 1.326444e-01, 2.801546e-02, 1.031377e-02, 8.210314e-03, 1.985107e-03, 8.054588e-05, 1.449037e-05};
 
 // io constants
-static const Bool_t  VariableBins(false);
+static const Bool_t  VariableBins(true);
 static const Bool_t  UseRootNTrgs(true);
-static const Float_t JetResParameter(0.5);
+static const Float_t JetResParameter(0.2);
 static const TString SParticle("ParticleJets/hJetPtCorrP");
 static const TString SDetector("MatchJets/hJetPtCorrM");
 static const TString SParEff("EventInfo/hParPtCorr");
@@ -48,9 +48,26 @@ void PrepareForUnfolding() {
   cout << "\n  Beginning preparation for unfolding..." << endl;
 
   // io parameters
-  const TString sOut("pp200r9embed.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root");
-  const TString SInFF[NHistFF]   = {"output/pp200r9pt5ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt7ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt9ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt11ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt15ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt25ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt35ff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root"};
-  const TString SInRFF[NHistRFF] = {"output/pp200r9pt4rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt5rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt7rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt9rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt11rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt15rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt25rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root", "output/pp200r9pt35rff.forQM22_pTbinOne.et920r05qt05130.2m4y2022.root"};
+  const TString sOut("pp200r9embed.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root");
+  const TString SInFF[NHistFF] = {
+    "output/pp200r9pt5ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt7ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt9ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt11ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt15ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt25ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt35ff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root"
+  };
+  const TString SInRFF[NHistRFF] = {
+    "output/pp200r9pt4rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt5rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt7rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt9rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt11rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt15rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt25rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root",
+    "output/pp200r9pt35rff.forClosureTest_pTbinGiant.et911r02qt05130.d3m8y2023.root"
+  };
 
   // open files
   TFile *fOut = new TFile(sOut.Data(), "recreate");
