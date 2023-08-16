@@ -31,29 +31,28 @@ void StJetFolder::Init() {
   if (!inputOK) assert(inputOK);
 
   // rebin histograms according to measured distribution
-  const UInt_t nPri      = _hPrior      -> GetNbinsX();
-  const UInt_t nSme      = _hSmeared    -> GetNbinsX();
-  const UInt_t nMeas     = _hMeasured   -> GetNbinsX();
-  const Bool_t rebinPri  = (nPri > nMeas);
-  const Bool_t rebinSme  = (nSme > nMeas);
-  if (rebinPri)  DoRebinning(_hPrior, _hMeasured);
-  if (rebinSme)  DoRebinning(_hSmeared, _hMeasured);
+  const UInt_t nPri     = _hPrior      -> GetNbinsX();
+  const UInt_t nSme     = _hSmeared    -> GetNbinsX();
+  const UInt_t nMeas    = _hMeasured   -> GetNbinsX();
+  const Bool_t rebinPri = (nPri > nMeas);
+  const Bool_t rebinSme = (nSme > nMeas);
+  if (rebinPri) DoRebinning(_hPrior, _hMeasured);
+  if (rebinSme) DoRebinning(_hSmeared, _hMeasured);
 
-  // create smoothed/alternate response
-  if (_smoothPrior) {
+  // create smoothed response
+  if (_smoothResponse) {
     SmoothPrior();
-    _response = new RooUnfoldResponse(0, 0, _hResponseDiff);
-  }
-  else {
-    if (_smoothResponse) {
+    SmoothResponse();
+    _response = new RooUnfoldResponse(0, 0, _hResponseSmooth);
+  } else if (_smoothPrior) {
       SmoothPrior();
-      SmoothResponse();
-      _response = new RooUnfoldResponse(0, 0, _hResponseSmooth);
-    }
-    if (_differentPrior) {
-      InitializePriors();
       _response = new RooUnfoldResponse(0, 0, _hResponseDiff);
-    }
+  }
+
+  // create alternate response
+  if (_differentPrior) {
+    InitializePriors();
+    _response = new RooUnfoldResponse(0, 0, _hResponseDiff);
   }
 
   // otherwise create default response
@@ -64,8 +63,7 @@ void StJetFolder::Init() {
   if (_response) {
     PrintInfo(4);
     _flag[10] = true;
-  }
-  else {
+  } else {
     PrintError(11);
     assert(_response);
   }
@@ -73,7 +71,7 @@ void StJetFolder::Init() {
 }  // end 'Init()'
 
 
-void StJetFolder::Unfold(Double_t &chi2unfold) {
+void StJetFolder::Unfold(Double_t &chi2unfold, const Bool_t forceApplyHistEff) {
 
   PrintInfo(5);
 
@@ -122,10 +120,14 @@ void StJetFolder::Unfold(Double_t &chi2unfold) {
   }
 
   // correct for efficiency
-  if (_smoothEfficiency)
+  if (_smoothEfficiency) {
     _hUnfolded -> Divide(_fEfficiency);
-  else
+    if (forceApplyHistEff) {
+      _hUnfolded -> Divide(_hEfficiency);
+    }
+  } else {
     _hUnfolded -> Divide(_hEfficiency);
+  }
 
   // calculate pearson coef.s
   if (_method != 0)
@@ -206,7 +208,7 @@ void StJetFolder::Unfold(Double_t &chi2unfold) {
 }  // end 'Unfold(Double_t)'
 
 
-void StJetFolder::Backfold(Double_t &chi2backfold, const Int_t nMcBack) {
+void StJetFolder::Backfold(Double_t &chi2backfold, const Int_t nMcBack, const Bool_t forceApplyHistEff) {
 
 
   // set no. of mc iterations
@@ -220,10 +222,14 @@ void StJetFolder::Backfold(Double_t &chi2backfold, const Int_t nMcBack) {
     _hNormalize  = (TH1D*) _hUnfolded -> Clone("hNormalize");
 
     // apply efficiency
-    if (_smoothEfficiency)
+    if (_smoothEfficiency) {
       _hBackfolded -> Multiply(_fEfficiency);
-    else
+      if (forceApplyHistEff) {
+        _hBackfolded -> Multiply(_hEfficiency);
+      }
+    } else {
       _hBackfolded -> Multiply(_hEfficiency);
+    }
 
     // calculate backfolding chi2
     _chi2backfold = CalculateChi2(_hMeasured, _hBackfolded);
