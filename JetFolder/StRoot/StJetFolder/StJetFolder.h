@@ -107,8 +107,8 @@ public:
   void SetUnfoldParameters(const Int_t method, const Int_t kReg, const Int_t nToy, const Double_t uMax=UdefMax, const Double_t bMax=BdefMax);
   // public methods ('StJetFolder.cxx')
   void Init();
-  void Unfold(Double_t &chi2unfold);
-  void Backfold(Double_t &chi2backfold, const Int_t nMcBack=NBackDef);
+  void Unfold(Double_t &chi2unfold, const Bool_t forceApplyHistEff=false);
+  void Backfold(Double_t &chi2backfold, const Int_t nMcBack=NBackDef, const Bool_t forceApplyHistEff=false);
   void Finish();
 
   // static public methods ('StJetFolder.math.h')
@@ -191,6 +191,7 @@ private:
   TH1D      *_hUnfoldErrors;
   TH1D      *_hEfficiency;
   TH1D      *_hResiduals;
+  TH1D      *_hSampleForRes;
   TH2D      *_hPearson;
   TH2D      *_hResponse;
   TH2D      *_hResponseDiff;
@@ -217,6 +218,8 @@ private:
   void     DoFourExpoSmoothing();
   void     ConstrainPriorRange(const UInt_t code);
   void     SmoothResponse();
+  void     DoSmoothingWithEffFit();
+  void     DoSmoothingWithEffHist();
   Bool_t   CheckFlags();
   // private methods ('StJetFolder.plot.h')
   void     CreateLabel();

@@ -347,6 +347,7 @@ void StJetFolder::Finish() {
     _hResponseDiff -> SetName("hResponseDiff");
   }
   if (_responseSmoothed) {
+    _hSampleForRes   -> SetName("hSampleForRes");
     _hPriorSmooth    -> SetName("hPriorSmooth");
     _hSmearedSmooth  -> SetName("hSmearedSmooth");
     _hResponseSmooth -> SetName("hResponseSmooth");
@@ -388,6 +389,7 @@ void StJetFolder::Finish() {
   }
   if (_responseSmoothed) {
     _hPriorSmooth    -> Write();
+    _hSampleForRes   -> Write();
     _hSmearedSmooth  -> Write();
     _hResponseSmooth -> Write();
     _fSmoothPrior    -> Write();

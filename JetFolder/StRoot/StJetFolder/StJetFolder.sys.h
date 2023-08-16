@@ -98,7 +98,13 @@ void StJetFolder::PrintInfo(const Int_t code) {
       cout << "      Using 4 exponent smoothing..." << endl;
       break;
     case 20:
-      cout << "    Smoothing response." << endl;
+      cout << "    Smoothing response:" << endl;
+      break;
+    case 21:
+      cout << "      Using efficiency fit while smoothing..." << endl;
+      break;
+    case 22:
+      cout << "      Using efficiency histogram while smoothing..." << endl;
       break;
   }
 
@@ -479,7 +485,7 @@ void StJetFolder::DoTwoExpoSmoothing() {
   }
 
   // only need smoothed prior if smoothing response
-  if (!_smoothPrior && _smoothResponse) return;
+  if (_smoothResponse) return;
 
 
   // create histogram to sample from and apply efficiency
@@ -694,7 +700,7 @@ void StJetFolder::DoThreeExpoSmoothing() {
   }
 
   // only need smoothed prior if smoothing response
-  if (!_smoothPrior && _smoothResponse) return;
+  if (_smoothResponse) return;
 
 
   // create histogram to sample from and apply efficiency
@@ -896,7 +902,7 @@ void StJetFolder::DoFourExpoSmoothing() {
   }
 
   // only need smoothed prior if smoothing response
-  if (!_smoothPrior && _smoothResponse) return;
+  if (_smoothResponse) return;
 
 
   // create histogram to sample from and apply efficiency
@@ -1007,6 +1013,23 @@ void StJetFolder::SmoothResponse() {
 
   PrintInfo(20);
 
+  if (_smoothEfficiency) {
+    DoSmoothingWithEffFit();
+  } else {
+    DoSmoothingWithEffHist();
+  }
+
+  // indicate that response is smoothed
+  _responseSmoothed = true;
+
+}  // end 'SmoothResponse()'
+
+
+
+void StJetFolder::DoSmoothingWithEffFit() {
+
+  PrintInfo(21);
+
   // response smoothing parameters
   const TString sFunc("gaus(0) + gaus(3)");
   const TString sQtNames[NPtPar]          = {"fQt_pt0206", "fQt_pt061", "fQt_pt12", "fQt_pt210", "fQt_pt1057"};
@@ -1014,9 +1037,27 @@ void StJetFolder::SmoothResponse() {
   const Float_t xQtRange[NRange]          = {0.5, 1.3};
   const Float_t xPtParLo[NPtPar]          = {0.2, 0.6, 1., 2., 10.};
   const Float_t xPtParHi[NPtPar]          = {0.6, 1., 2., 10., 57.};
-  const Float_t fQt911[NPtPar][NParGaus]  = {{0.59, 1.01, 0.06, 0.007, 0.62, 0.06}, {0.68, 1.02, 0.06, 0.04, 0.67, 0.06}, {0.57, 1.02, 0.07, 0.06, 0.68, 0.06}, {0.47, 1.01, 0.07, 0.15, 0.73, 0.08}, {0.48, 0.99, 0.07, 0.12, 0.71, 0.08}};
-  const Float_t fQt1115[NPtPar][NParGaus] = {{0.66, 1.00, 0.06, 0.003, 0.60, 0.06}, {0.51, 1.00, 0.06, 0.03, 0.67, 0.06}, {0.53, 1.01, 0.07, 0.12, 0.68, 0.06}, {0.52, 1.00, 0.07, 0.09, 0.71, 0.08}, {0.47, 0.97, 0.07, 0.11, 0.69, 0.08}};
-  const Float_t fQt1520[NPtPar][NParGaus] = {{0.53, 1.00, 0.06, 0.003, 0.64, 0.06}, {0.56, 1.00, 0.06, 0.002, 0.60, 0.06}, {0.57, 1.00, 0.07, 0.04, 0.68, 0.08}, {0.48, 1.00, 0.07, 0.14, 0.70, 0.07}, {0.47, 0.97, 0.07, 0.13, 0.68, 0.08}};
+  const Float_t fQt911[NPtPar][NParGaus]  = {
+    {0.59, 1.01, 0.06, 0.007, 0.62, 0.06},
+    {0.68, 1.02, 0.06, 0.04,  0.67, 0.06},
+    {0.57, 1.02, 0.07, 0.06,  0.68, 0.06},
+    {0.47, 1.01, 0.07, 0.15,  0.73, 0.08},
+    {0.48, 0.99, 0.07, 0.12,  0.71, 0.08}
+  };
+  const Float_t fQt1115[NPtPar][NParGaus] = {
+    {0.66, 1.00, 0.06, 0.003, 0.60, 0.06},
+    {0.51, 1.00, 0.06, 0.03,  0.67, 0.06},
+    {0.53, 1.01, 0.07, 0.12,  0.68, 0.06},
+    {0.52, 1.00, 0.07, 0.09,  0.71, 0.08},
+    {0.47, 0.97, 0.07, 0.11,  0.69, 0.08}
+  };
+  const Float_t fQt1520[NPtPar][NParGaus] = {
+    {0.53, 1.00, 0.06, 0.003, 0.64, 0.06},
+    {0.56, 1.00, 0.06, 0.002, 0.60, 0.06},
+    {0.57, 1.00, 0.07, 0.04,  0.68, 0.08},
+    {0.48, 1.00, 0.07, 0.14,  0.70, 0.07},
+    {0.47, 0.97, 0.07, 0.13,  0.68, 0.08}
+  };
 
   // prior sampling parameters
   const TString sParSampleName("fParForResSmooth");
@@ -1024,7 +1065,6 @@ void StJetFolder::SmoothResponse() {
   const TString sParSample1115("(expo(0) + expo(2) + expo(4)) * (tanh((x-[6])/[7]) + tanh((x-[8])/[9])) * ([10] * (1 - TMath::Exp(-1.*[11]*x)))");
   const TString sParSample1520("(expo(0) + expo(2) + expo(4) + expo(6)) * (tanh((x-[8])/[9]) + tanh((x-[10])/[11])) * ([12] * (1 - TMath::Exp(-1.*[13]*x)))");
   const Double_t xParSampleRange[NPts] = {0.1, 57.};
-
 
   // select qT fit parameters
   Float_t fFuncPar[NPtPar][NParGaus];
@@ -1058,7 +1098,6 @@ void StJetFolder::SmoothResponse() {
       }
       break;
   }  // end switch-case
-
 
   // create smoothing functions
   for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
@@ -1135,15 +1174,16 @@ void StJetFolder::SmoothResponse() {
       break;
   }  // end switch-case
 
-
   // initialize smoothed histograms
+  _hSampleForRes   = (TH1D*) _hPrior    -> Clone();
   _hSmearedSmooth  = (TH1D*) _hSmeared  -> Clone();
   _hResponseSmooth = (TH2D*) _hResponse -> Clone();
+  _hSampleForRes   -> SetTitle("Sampled prior + efficiency");
   _hSmearedSmooth  -> SetTitle("Smoothed smeared");
   _hResponseSmooth -> SetTitle("Smoothed response matrix");
+  _hSampleForRes   -> Reset("ICE");
   _hSmearedSmooth  -> Reset("ICE");
   _hResponseSmooth -> Reset("ICE");
-
 
   // mc loop
   for (Int_t iMC = 0; iMC < _nMcSmooth; iMC++) {
@@ -1154,6 +1194,9 @@ void StJetFolder::SmoothResponse() {
     do {
       pTpar      = _fParToSample -> GetRandom();
       isAboveMin = (pTpar > 0.2);
+      if (isAboveMin)  {
+        _hSampleForRes -> Fill(pTpar);
+      }
     } while (!isAboveMin);
 
     // determine pTpar bin and fill histograms
@@ -1185,7 +1228,6 @@ void StJetFolder::SmoothResponse() {
       } 
     }  // end pTpar bin loop
   }  // end mc loop
-
 
   // normalize response
   const UInt_t nResX = _hResponseSmooth -> GetNbinsX();
@@ -1219,10 +1261,250 @@ void StJetFolder::SmoothResponse() {
   const Double_t scaleS    = intDet / intDetMC;
   if (intDetMC > 0.) _hSmearedDiff -> Scale(scaleS);
 
-  // indicate that response is smoothed
-  _responseSmoothed = true;
+}  // end 'DoSmoothingWithEffFit()'
 
-}  // end 'SmoothResponse()'
+
+
+void StJetFolder::DoSmoothingWithEffHist() {
+
+  PrintInfo(22);
+
+  // response smoothing parameters
+  const TString sFunc("gaus(0) + gaus(3)");
+  const TString sQtNames[NPtPar]          = {"fQt_pt0206", "fQt_pt061", "fQt_pt12", "fQt_pt210", "fQt_pt1057"};
+  const Float_t xFuncDef[NRange]          = {0., 2.};
+  const Float_t xQtRange[NRange]          = {0.5, 1.3};
+  const Float_t xPtParLo[NPtPar]          = {0.2, 0.6, 1., 2., 10.};
+  const Float_t xPtParHi[NPtPar]          = {0.6, 1., 2., 10., 57.};
+  const Float_t fQt911[NPtPar][NParGaus]  = {
+    {0.59, 1.01, 0.06, 0.007, 0.62, 0.06},
+    {0.68, 1.02, 0.06, 0.04,  0.67, 0.06},
+    {0.57, 1.02, 0.07, 0.06,  0.68, 0.06},
+    {0.47, 1.01, 0.07, 0.15,  0.73, 0.08},
+    {0.48, 0.99, 0.07, 0.12,  0.71, 0.08}
+  };
+  const Float_t fQt1115[NPtPar][NParGaus] = {
+    {0.66, 1.00, 0.06, 0.003, 0.60, 0.06},
+    {0.51, 1.00, 0.06, 0.03,  0.67, 0.06},
+    {0.53, 1.01, 0.07, 0.12,  0.68, 0.06},
+    {0.52, 1.00, 0.07, 0.09,  0.71, 0.08},
+    {0.47, 0.97, 0.07, 0.11,  0.69, 0.08}
+  };
+  const Float_t fQt1520[NPtPar][NParGaus] = {
+    {0.53, 1.00, 0.06, 0.003, 0.64, 0.06},
+    {0.56, 1.00, 0.06, 0.002, 0.60, 0.06},
+    {0.57, 1.00, 0.07, 0.04,  0.68, 0.08},
+    {0.48, 1.00, 0.07, 0.14,  0.70, 0.07},
+    {0.47, 0.97, 0.07, 0.13,  0.68, 0.08}
+  };
+
+  // prior sampling parameters
+  const TString sParSampleName("fParForResSmooth");
+  const TString sParSample911("(expo(0) + expo(2)) * tanh((x-[4]/[5]))");
+  const TString sParSample1115("(expo(0) + expo(2) + expo(4)) * (tanh((x-[6])/[7]) + tanh((x-[8])/[9]))");
+  const TString sParSample1520("(expo(0) + expo(2) + expo(4) + expo(6)) * (tanh((x-[8])/[9]) + tanh((x-[10])/[11]))");
+  const Double_t xParSampleRange[NPts] = {0.1, 57.};
+
+  // select qT fit parameters
+  Float_t fFuncPar[NPtPar][NParGaus];
+  switch (_eTtrgIndex) {
+    case 0:
+      for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+        for (UInt_t iParGaus = 0; iParGaus < NParGaus; iParGaus++) {
+          fFuncPar[iPtPar][iParGaus] = fQt911[iPtPar][iParGaus];
+        }
+      }
+      break;
+    case 1:
+      for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+        for (UInt_t iParGaus = 0; iParGaus < NParGaus; iParGaus++) {
+          fFuncPar[iPtPar][iParGaus] = fQt1115[iPtPar][iParGaus];
+        }
+      }
+      break;
+    case 2:
+      for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+        for (UInt_t iParGaus = 0; iParGaus < NParGaus; iParGaus++) {
+          fFuncPar[iPtPar][iParGaus] = fQt1520[iPtPar][iParGaus];
+        }
+      }
+      break;
+    default:
+      for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+        for (UInt_t iParGaus = 0; iParGaus < NParGaus; iParGaus++) {
+          fFuncPar[iPtPar][iParGaus] = fQt911[iPtPar][iParGaus];
+        }
+      }
+      break;
+  }  // end switch-case
+
+  // create smoothing functions
+  for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+    _fQtSmooth[iPtPar] = new TF1(sQtNames[iPtPar].Data(), sFunc.Data(), xFuncDef[0], xFuncDef[1]);
+    for (UInt_t iParam = 0; iParam < NParGaus; iParam++) {
+      _fQtSmooth[iPtPar] -> SetParameter(iParam, fFuncPar[iPtPar][iParam]);
+    }
+  }  // end pTPar bin loop
+
+  // determine fit range
+  Double_t xUseRange[NRange] = {0., 0.};
+  if (_applyCutoff) {
+    xUseRange[0] = TMath::Max(_pTcutoff, xParSampleRange[0]);
+  } else {
+    xUseRange[0] = xParSampleRange[0];
+  }
+  xUseRange[1] = xParSampleRange[1];
+
+  // create function to sample from
+  switch (_eTtrgIndex) {
+    case 0:
+      _fParToSample = new TF1(sParSampleName.Data(), sParSample911.Data(), xUseRange[0], xUseRange[1]);
+      _fParToSample -> FixParameter(0, _fSmoothPrior -> GetParameter(0));
+      _fParToSample -> FixParameter(1, _fSmoothPrior -> GetParameter(1));
+      _fParToSample -> FixParameter(2, _fSmoothPrior -> GetParameter(2));
+      _fParToSample -> FixParameter(3, _fSmoothPrior -> GetParameter(3));
+      _fParToSample -> FixParameter(4, _fSmoothPrior -> GetParameter(4));
+      _fParToSample -> FixParameter(5, _fSmoothPrior -> GetParameter(5));
+      break;
+    case 1:
+      _fParToSample = new TF1(sParSampleName.Data(), sParSample1115.Data(), xUseRange[0], xUseRange[1]);
+      _fParToSample -> FixParameter(0,  _fSmoothPrior -> GetParameter(0));
+      _fParToSample -> FixParameter(1,  _fSmoothPrior -> GetParameter(1));
+      _fParToSample -> FixParameter(2,  _fSmoothPrior -> GetParameter(2));
+      _fParToSample -> FixParameter(3,  _fSmoothPrior -> GetParameter(3));
+      _fParToSample -> FixParameter(4,  _fSmoothPrior -> GetParameter(4));
+      _fParToSample -> FixParameter(5,  _fSmoothPrior -> GetParameter(5));
+      _fParToSample -> FixParameter(6,  _fSmoothPrior -> GetParameter(6));
+      _fParToSample -> FixParameter(7,  _fSmoothPrior -> GetParameter(7));
+      _fParToSample -> FixParameter(8,  _fSmoothPrior -> GetParameter(8));
+      _fParToSample -> FixParameter(9,  _fSmoothPrior -> GetParameter(9));
+      break;
+    case 2:
+      _fParToSample = new TF1(sParSampleName.Data(), sParSample1520.Data(), xUseRange[0], xUseRange[1]);
+      _fParToSample -> FixParameter(0,  _fSmoothPrior -> GetParameter(0));
+      _fParToSample -> FixParameter(1,  _fSmoothPrior -> GetParameter(1));
+      _fParToSample -> FixParameter(2,  _fSmoothPrior -> GetParameter(2));
+      _fParToSample -> FixParameter(3,  _fSmoothPrior -> GetParameter(3));
+      _fParToSample -> FixParameter(4,  _fSmoothPrior -> GetParameter(4));
+      _fParToSample -> FixParameter(5,  _fSmoothPrior -> GetParameter(5));
+      _fParToSample -> FixParameter(6,  _fSmoothPrior -> GetParameter(6));
+      _fParToSample -> FixParameter(7,  _fSmoothPrior -> GetParameter(7));
+      _fParToSample -> FixParameter(8,  _fSmoothPrior -> GetParameter(8));
+      _fParToSample -> FixParameter(9,  _fSmoothPrior -> GetParameter(9));
+      _fParToSample -> FixParameter(10, _fSmoothPrior -> GetParameter(10));
+      _fParToSample -> FixParameter(11, _fSmoothPrior -> GetParameter(11));
+      break;
+    default:
+      _fParToSample = new TF1(sParSampleName.Data(), sParSample911.Data(), xParSampleRange[0], xParSampleRange[1]);
+      _fParToSample -> FixParameter(0, _fSmoothPrior -> GetParameter(0));
+      _fParToSample -> FixParameter(1, _fSmoothPrior -> GetParameter(1));
+      _fParToSample -> FixParameter(2, _fSmoothPrior -> GetParameter(2));
+      _fParToSample -> FixParameter(3, _fSmoothPrior -> GetParameter(3));
+      _fParToSample -> FixParameter(4, _fSmoothPrior -> GetParameter(4));
+      _fParToSample -> FixParameter(5, _fSmoothPrior -> GetParameter(5));
+      break;
+  }  // end switch-case
+
+  // initialize smoothed histograms
+  _hSampleForRes   = (TH1D*) _hPrior    -> Clone();
+  _hSmearedSmooth  = (TH1D*) _hSmeared  -> Clone();
+  _hResponseSmooth = (TH2D*) _hResponse -> Clone();
+  _hSampleForRes   -> SetTitle("Sampled prior + efficiency");
+  _hSmearedSmooth  -> SetTitle("Smoothed smeared");
+  _hResponseSmooth -> SetTitle("Smoothed response matrix");
+  _hSampleForRes   -> Reset("ICE");
+  _hSmearedSmooth  -> Reset("ICE");
+  _hResponseSmooth -> Reset("ICE");
+
+  // mc loop
+  for (Int_t iMC = 0; iMC < _nMcSmooth; iMC++) {
+
+    // sample from particle distribution
+    Bool_t   isAboveMin(false);
+    UInt_t   iEffCheck(0);
+    Float_t  effSample(0.);
+    Float_t  effCheck(0.);
+    Double_t pTpar(0.);
+    do {
+
+      // sample and apply efficiency
+      pTpar     = _fParToSample -> GetRandom();
+      effSample = _rando        -> Uniform(0., 1.);
+      iEffCheck = _hEfficiency  -> FindBin(pTpar);
+      effCheck  = _hEfficiency  -> GetBinContent(iEffCheck);
+      if (effSample > effCheck) pTpar = -999.;
+
+      // check if sample survived
+      isAboveMin = (pTpar > 0.2);
+      if (isAboveMin)  {
+        _hSampleForRes -> Fill(pTpar);
+      }
+    } while (!isAboveMin);
+
+    // determine pTpar bin and fill histograms
+    const UInt_t iPtBig = NPtPar - 1;
+    for (UInt_t iPtPar = 0; iPtPar < NPtPar; iPtPar++) {
+      if ((pTpar >= xPtParLo[iPtPar]) && (pTpar < xPtParHi[iPtPar])) {
+        const Double_t qTjet = _fQtSmooth[iPtPar] -> GetRandom(xQtRange[0], xQtRange[1]);
+        const Double_t pTdet = pTpar * qTjet;
+        // quick fix [02.04.2022]
+        //if (pTdet > 2.) {
+        //  _hResponseSmooth -> Fill(pTdet, pTpar);
+        //  _hSmearedSmooth  -> Fill(pTdet);
+        //}
+        _hResponseSmooth -> Fill(pTdet, pTpar);
+        _hSmearedSmooth  -> Fill(pTdet);
+        break;
+      }
+      else if (pTpar > xPtParHi[iPtBig]) {
+        const Double_t qTjet = _fQtSmooth[iPtBig] -> GetRandom(xQtRange[0], xQtRange[1]);
+        const Double_t pTdet = pTpar * qTjet;
+        // quick fix [02.04.2022]
+        //if (pTdet > 2.) {
+        //  _hResponseSmooth -> Fill(pTdet, pTpar);
+        //  _hSmearedSmooth  -> Fill(pTdet);
+        //}
+        _hResponseSmooth -> Fill(pTdet, pTpar);
+        _hSmearedSmooth  -> Fill(pTdet);
+        break;
+      } 
+    }  // end pTpar bin loop
+  }  // end mc loop
+
+  // normalize response
+  const UInt_t nResX = _hResponseSmooth -> GetNbinsX();
+  const UInt_t nResY = _hResponseSmooth -> GetNbinsY();
+  for (UInt_t iResY = 1; iResY < (nResY + 1); iResY++) {
+    const Double_t intResY = _hResponseSmooth -> Integral(1, nResX, iResY, iResY);
+    for (UInt_t iResX = 1; iResX < (nResX + 1); iResX++) {
+      const Double_t resBin  = _hResponseSmooth -> GetBinContent(iResX, iResY);
+      const Double_t resErr  = _hResponseSmooth -> GetBinError(iResX, iResY);
+      if (intResY > 0.) {
+        _hResponseSmooth -> SetBinContent(iResX, iResY, resBin / intResY);
+        _hResponseSmooth -> SetBinError(iResX, iResY, resErr / intResY);
+      }
+    }  // ned pTdet bin loop
+  }  // end pTpar bin loop
+
+  // normalize smoothed smeared hist
+  const UInt_t nPtX = _hSmearedSmooth -> GetNbinsX();
+  for (UInt_t iPt = 1; iPt < (nPtX + 1); iPt++) {
+    const Double_t binDet   = _hSmearedSmooth -> GetBinContent(iPt);
+    const Double_t errDet   = _hSmearedSmooth -> GetBinError(iPt);
+    const Double_t binWidth = _hSmearedSmooth -> GetBinWidth(iPt);
+    _hSmearedSmooth -> SetBinContent(iPt, binDet / binWidth);
+    _hSmearedSmooth -> SetBinError(iPt, errDet / binWidth);
+  }
+
+  const UInt_t   iDetStart = _hSmearedSmooth -> FindFirstBinAbove(0.);
+  const UInt_t   iDetStop  = _hSmearedSmooth -> FindLastBinAbove(0.);
+  const Double_t intDet    = _hSmeared       -> Integral(iDetStart, iDetStop);
+  const Double_t intDetMC  = _hSmearedSmooth -> Integral();
+  const Double_t scaleS    = intDet / intDetMC;
+  if (intDetMC > 0.) _hSmearedDiff -> Scale(scaleS);
+
+}  // end 'DoSmoothingWithEffHist()'
+
 
 
 Bool_t StJetFolder::CheckFlags() {
@@ -1236,8 +1518,9 @@ Bool_t StJetFolder::CheckFlags() {
       break;
     }
   }
-  if (spectraOK)
+  if (spectraOK) {
     PrintInfo(1);
+  }
 
   // check info
   Bool_t infoOK = true;
@@ -1248,8 +1531,9 @@ Bool_t StJetFolder::CheckFlags() {
       break;
     }
   }
-  if (infoOK)
+  if (infoOK) {
     PrintInfo(2);
+  }
 
   // check parameters
   Bool_t parametersOK = true;
@@ -1260,9 +1544,9 @@ Bool_t StJetFolder::CheckFlags() {
       break;
     }
   }
-  if (parametersOK)
+  if (parametersOK) {
     PrintInfo(3);
-
+  }
 
   Bool_t inputOK = (spectraOK && infoOK && parametersOK);
   return inputOK;
