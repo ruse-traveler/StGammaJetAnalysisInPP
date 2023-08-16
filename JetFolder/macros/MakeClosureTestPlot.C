@@ -1,4 +1,4 @@
-// 'MakeClosureTestPlotWithAverage.C'
+// 'MakeClosureTestPlot.C'
 // Derek Anderson
 // 01.10.2022
 //
@@ -44,7 +44,7 @@ static const UInt_t NTrgs(NTrgIds * NTrgBins);
 
 // trigger parameters
 static const UInt_t TrigId(0);
-static const UInt_t TrigBin(2);
+static const UInt_t TrigBin(0);
 
 
 
@@ -55,18 +55,20 @@ void MakeClosureTestPlot() {
   cout << "\n  Plotting closure test..." << endl;
 
   // io particle parameters
-  const TString sOut("closureTestRFF.forDetCutoffRedo_pTbinHuge.et1520r05pi0.d17m5y2022.root");
-  const TString sInSys("et1520r05rff_cutoffClosure/summedErrorsRFF.modStats_forClosureTest_pTbinHuge.et1520r05pi0.d26m10y2021.root");
-  const TString sInStat("et1520r05rff_cutoffClosure/summedErrorsRFF.modStats_forClosureTest_pTbinHuge.et1520r05pi0.d26m10y2021.root");
+  const TString sOut("closureTestFF.withErrSmooth_noEffSmooth_withResSmooth_pTbinHuge.et911r05pi0.d15m8y2023.root");
+  const TString sInSys("et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
+  const TString sInStat("et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
   const TString sHistSys("hPlotSysUnfoldSmooth");
   const TString sHistStat("hStatistics");
 
   // io variation parameters
-  const TString sInVar[NVars]   = {"et1520r05rff_cutoffClosure/pp200r9rff.default_detCutButNormalRes_pTbinHuge.et1520r05qt05130.p0m1k3n38t5.root",
-                                   "et1520r05rff_cutoffClosure/pp200r9rff.forRegSysM1_detCutButNormalRes_pTbinHuge.et1520r05qt05130.p0m1k2n38t5.root",
-                                   "et1520r05rff_cutoffClosure/pp200r9rff.forRegSysP1_detCutButNormalRes_pTbinHuge.et1520r05qt05130.p0m1k4n38t5.root",
-                                   "et1520r05rff_cutoffClosure/pp200r9rff.forDefLevySys_detCutButNormalRes_pTbinHuge.et1520r05qt05130.p1m1k3n38t5.root",
-                                   "et1520r05rff_cutoffClosure/pp200r9rff.forAltLevySys_detCutButNormalRes_pTbinHuge.et1520r05qt05130.p1m1k3n64t8.root"};
+  const TString sInVar[NVars] = {
+    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.default_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k3n46t4.root",
+    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysM1_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k2n46t4.root",
+    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysP1_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k4n46t4.root",
+    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forDefLevySys_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n46t4.root",
+    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forAltLevySys_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n61t5.root"
+  };
   const TString sHistVar[NVars] = {"hUnfolded", "hUnfolded", "hUnfolded", "hUnfolded", "hUnfolded"};
 
   // particle plot parameters
@@ -85,11 +87,13 @@ void MakeClosureTestPlot() {
   const TString sGraphVar[NVars]   = {"gVarDefault", "gVarRegM1", "gVarRegP1", "gVarDefLevy", "gVarAltLevy"};
   const TString sNameRatio[NVars]  = {"hRatDefault", "hRatRegM1", "hRatRegP1", "hRatDefLevy", "hRatAltLevy"};
   const TString sGraphRatio[NVars] = {"gRatDefault", "gRatRegM1", "gRatRegP1", "gRatDefLevy", "gRatAltLevy"};
-  const TString sLabelVar[NVars]   = {"unfolded det.-lvl. [default, n^{*}_{iter} = 3]",
-                                      "unfolded det.-lvl. [n^{*}_{iter} - 1]",
-                                      "unfolded det.-lvl. [n^{*}_{iter} + 1]",
-                                      "unfolded det.-lvl. [levy prior: n = 3.8, t = 0.5]",
-                                      "unfolded det.-lvl. [levy prior: n = 6.4, t = 0.8]"};
+  const TString sLabelVar[NVars]   = {
+    "unfolded det.-lvl. [default, n^{*}_{iter} = 3]",
+    "unfolded det.-lvl. [n^{*}_{iter} - 1]",
+    "unfolded det.-lvl. [n^{*}_{iter} + 1]",
+    "unfolded det.-lvl. [levy prior: n = 4.6, t = 0.4]",
+    "unfolded det.-lvl. [levy prior: n = 6.1, t = 0.5]"
+  };
   const UInt_t  fMarSty[NVars]     = {21, 20, 22, 23, 34};
   const UInt_t  fLinSty[NVars]     = {1, 1, 1, 1, 1};
   const UInt_t  fFilStyR[NVars]    = {0, 0, 0, 0, 0};
@@ -106,20 +110,39 @@ void MakeClosureTestPlot() {
   const Float_t xCalcRange[NPlot] = {0., 30.};
 
   // text parameters
-  const TString sSys("Py6#oplusGeant(RFF), #sqrt{s} = 200 GeV");
+  const TString sSys("Py6#oplusGeant(FF), #sqrt{s} = 200 GeV");
   const TString sJet("anti-k_{T}, R = 0.5");
   const TString sTyp("#bf{charged jets}");
-  const TString sTest("Py6#oplusGeant(RFF) unfolded w/ Py6#oplusGeant(FF)");
+  const TString sTest("Py6#oplusGeant(FF) unfolded w/ Py6#oplusGeant(RFF)");
   const TString sTestAvg("p+p closure test");
-  const TString sTrgAvg("15 < p_{T}^{trg} < 20 GeV/c");
+  const TString sTrgAvg("9 < p_{T}^{trg} < 11 GeV/c");
   const TString sSysAvg("#pi^{0}+jet");
+
+  // smoothing parameters
+  const Bool_t  doAvgSmooth(true);
+  const Float_t xSmoothBegin(3.);
+  const Float_t xInterpol[NTrgs] = {15., 15., 15., 4., 6., 11.};
 
   // define color schemes
   const UInt_t fColSy[NTrgs]       = {593, 425, 409, 625, 609, 593};
   const UInt_t fColOu[NTrgs]       = {604, 436, 420, 636, 620, 604};
   const UInt_t fColSt[NTrgs]       = {923, 923, 923, 923, 923, 923};
-  const UInt_t fColV[NTrgs][NVars] = {{602, 883, 618, 893, 634}, {434, 863, 602, 883, 618}, {418, 843, 434, 863, 602}, {634, 803, 402, 813, 418}, {618, 893, 634, 803, 402}, {602, 883, 618, 893, 634}};
-  const UInt_t fColR[NTrgs][NVars] = {{602, 883, 618, 893, 634}, {434, 863, 602, 883, 618}, {418, 843, 434, 863, 602}, {634, 803, 402, 813, 418}, {618, 893, 634, 803, 402}, {602, 883, 618, 893, 634}};
+  const UInt_t fColV[NTrgs][NVars] = {
+    {602, 883, 618, 893, 634},
+    {434, 863, 602, 883, 618},
+    {418, 843, 434, 863, 602},
+    {634, 803, 402, 813, 418},
+    {618, 893, 634, 803, 402},
+    {602, 883, 618, 893, 634}
+  };
+  const UInt_t fColR[NTrgs][NVars] = {
+    {602, 883, 618, 893, 634},
+    {434, 863, 602, 883, 618},
+    {418, 843, 434, 863, 602},
+    {634, 803, 402, 813, 418},
+    {618, 893, 634, 803, 402},
+    {602, 883, 618, 893, 634}
+  };
 
   // parse trigger selection
   UInt_t fTrg(0);
@@ -135,73 +158,81 @@ void MakeClosureTestPlot() {
   UInt_t  fColStat(0);
   UInt_t  fColVar[NVars];
   UInt_t  fColRatio[NVars];
+  Float_t xIntBegin(0.);
   TString sTrg("");
   switch(fTrg) {
     case 0:
-      sTrg     = "#pi^{0} trig., E_{T}^{trg} #in (9, 11) GeV";
-      fColSys  = fColSy[0];
-      fColOut  = fColOu[0];
-      fColStat = fColSt[0];
+      sTrg      = "#pi^{0} trig., E_{T}^{trg} #in (9, 11) GeV";
+      fColSys   = fColSy[0];
+      fColOut   = fColOu[0];
+      fColStat  = fColSt[0];
+      xIntBegin = xInterpol[0];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[0][iVar];
         fColRatio[iVar] = fColR[0][iVar];
       }
       break;
     case 1:
-      sTrg     = "#pi^{0} trig., E_{T}^{trg} #in (11, 15) GeV";
-      fColSys  = fColSy[1];
-      fColOut  = fColOu[1];
-      fColStat = fColSt[1];
+      sTrg      = "#pi^{0} trig., E_{T}^{trg} #in (11, 15) GeV";
+      fColSys   = fColSy[1];
+      fColOut   = fColOu[1];
+      fColStat  = fColSt[1];
+      xIntBegin = xInterpol[1];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[1][iVar];
         fColRatio[iVar] = fColR[1][iVar];
       }
       break;
     case 2:
-      sTrg     = "#pi^{0} trig., E_{T}^{trg} #in (15, 20) GeV";
-      fColSys  = fColSy[2];
-      fColOut  = fColOu[2];
-      fColStat = fColSt[2];
+      sTrg      = "#pi^{0} trig., E_{T}^{trg} #in (15, 20) GeV";
+      fColSys   = fColSy[2];
+      fColOut   = fColOu[2];
+      fColStat  = fColSt[2];
+      xIntBegin = xInterpol[2];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[2][iVar];
         fColRatio[iVar] = fColR[2][iVar];
       }
       break;
     case 3:
-      sTrg     = "#gamma^{dir} trig., E_{T}^{trg} #in (9, 11) GeV";
-      fColSys  = fColSy[3];
-      fColOut  = fColOu[3];
-      fColStat = fColSt[3];
+      sTrg      = "#gamma^{dir} trig., E_{T}^{trg} #in (9, 11) GeV";
+      fColSys   = fColSy[3];
+      fColOut   = fColOu[3];
+      fColStat  = fColSt[3];
+      xIntBegin = xInterpol[3];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[3][iVar];
         fColRatio[iVar] = fColR[3][iVar];
       }
       break;
     case 4:
-      sTrg     = "#gamma^{dir} trig., E_{T}^{trg} #in (11, 15) GeV";
-      fColSys  = fColSy[4];
-      fColOut  = fColOu[4];
-      fColStat = fColSt[4];
+      sTrg      = "#gamma^{dir} trig., E_{T}^{trg} #in (11, 15) GeV";
+      fColSys   = fColSy[4];
+      fColOut   = fColOu[4];
+      fColStat  = fColSt[4];
+      xIntBegin = xInterpol[4];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[4][iVar];
         fColRatio[iVar] = fColR[4][iVar];
       }
       break;
     case 5:
-      sTrg     = "#gamma^{dir} trig., E_{T}^{trg} #in (15, 20) GeV";
-      fColSys  = fColSy[5];
-      fColOut  = fColOu[5];
-      fColStat = fColSt[5];
+      sTrg      = "#gamma^{dir} trig., E_{T}^{trg} #in (15, 20) GeV";
+      fColSys   = fColSy[5];
+      fColOut   = fColOu[5];
+      fColStat  = fColSt[5];
+      xIntBegin = xInterpol[5];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[5][iVar];
         fColRatio[iVar] = fColR[5][iVar];
       }
       break;
     default:
-      sTrg     = "#pi^{0} trig., E_{T}^{trg} #in (9, 11) GeV";
-      fColSys  = fColSy[0];
-      fColOut  = fColOu[0];
-      fColStat = fColSt[0];
+      sTrg      = "#pi^{0} trig., E_{T}^{trg} #in (9, 11) GeV";
+      fColSys   = fColSy[0];
+      fColOut   = fColOu[0];
+      fColStat  = fColSt[0];
+      xIntBegin = xInterpol[0];
       for (UInt_t iVar = 0; iVar < NVars; iVar++) {
         fColVar[iVar]   = fColV[0][iVar];
         fColRatio[iVar] = fColR[0][iVar];
@@ -321,6 +352,115 @@ void MakeClosureTestPlot() {
     hRatioAvg -> SetBinError(iBin, ratMaxD);
   }
   cout << "    Calculated averages." << endl;
+
+  // smooth average histograms
+  if (doAvgSmooth) {
+
+    // smooth average solution
+    const UInt_t nAvgBins = hAverage -> GetNbinsX();
+    for (UInt_t iAvgBin = 2; iAvgBin < nAvgBins; iAvgBin++) {
+
+      // get bin info
+      const Double_t thisBinLoc = hAverage -> GetBinCenter(iAvgBin);
+      const Double_t thisBinVal = hAverage -> GetBinContent(iAvgBin);
+      const Double_t prevBinVal = hAverage -> GetBinContent(iAvgBin - 1);
+      const Double_t nextBinVal = hAverage -> GetBinContent(iAvgBin + 1);
+      const Double_t thisBinAbs = hAverage -> GetBinError(iAvgBin);
+      const Double_t prevBinAbs = hAverage -> GetBinError(iAvgBin - 1);
+      const Double_t nextBinAbs = hAverage -> GetBinError(iAvgBin + 1);
+      const Double_t thisBinErr = thisBinAbs / thisBinVal;
+      const Double_t prevBinErr = prevBinAbs / prevBinVal;
+      const Double_t nextBinErr = nextBinAbs / nextBinVal;
+
+      // check bins
+      const Bool_t areBinsNonzero = ((thisBinVal > 0.) && (nextBinVal > 0.));
+      const Bool_t isInSmoothZone = (thisBinLoc < xIntBegin); 
+      const Bool_t isAboveStart   = (thisBinLoc >= xSmoothBegin);
+      if (!areBinsNonzero || !isAboveStart) continue;
+
+      // check how sys compare
+      const Bool_t prevMoreThanThis = (prevBinErr > thisBinErr);
+      const Bool_t prevMoreThanNext = (prevBinErr > nextBinErr);
+      const Bool_t thisMoreThanBoth = ((thisBinErr > prevBinErr) && (thisBinErr > nextBinErr));
+
+      // if (x < xInterpol) smooth; else, interpolate
+      if (isInSmoothZone) {
+        if (prevMoreThanThis) {
+          const Double_t newThisErr = thisBinVal * prevBinErr;
+          hAverage -> SetBinError(iAvgBin, newThisErr);
+        }
+      } else {
+        if (thisMoreThanBoth) {
+          const Double_t newNextErr = nextBinVal * thisBinErr;
+          hAverage -> SetBinError(iAvgBin + 1, newNextErr); 
+        } else if (prevMoreThanNext) {
+          const Double_t newThisErr = thisBinVal * prevBinErr;
+          const Double_t newNextErr = nextBinVal * prevBinErr;
+          hAverage -> SetBinError(iAvgBin, newThisErr);
+          hAverage -> SetBinError(iAvgBin + 1, newNextErr);
+        } else if (prevMoreThanThis) {
+          const Double_t errorDiff  = nextBinErr - prevBinErr;
+          const Double_t errorAdj   = errorDiff / 2.;
+          const Double_t thisBinAdj = prevBinErr + errorAdj;
+          const Double_t newThisErr = thisBinVal * thisBinAdj;
+          hAverage -> SetBinError(iAvgBin, newThisErr);
+        }
+      }  // end smoothing/interpolating
+    }  // end average bin loop
+
+    // smooth average ratio
+    const UInt_t nRatBins = hRatioAvg -> GetNbinsX();
+    for (UInt_t iRatBin = 2; iRatBin < nRatBins; iRatBin++) {
+
+      // get bin info
+      const Double_t thisBinLoc = hRatioAvg -> GetBinCenter(iRatBin);
+      const Double_t thisBinVal = hRatioAvg -> GetBinContent(iRatBin);
+      const Double_t prevBinVal = hRatioAvg -> GetBinContent(iRatBin - 1);
+      const Double_t nextBinVal = hRatioAvg -> GetBinContent(iRatBin + 1);
+      const Double_t thisBinAbs = hRatioAvg -> GetBinError(iRatBin);
+      const Double_t prevBinAbs = hRatioAvg -> GetBinError(iRatBin - 1);
+      const Double_t nextBinAbs = hRatioAvg -> GetBinError(iRatBin + 1);
+      const Double_t thisBinErr = thisBinAbs / thisBinVal;
+      const Double_t prevBinErr = prevBinAbs / prevBinVal;
+      const Double_t nextBinErr = nextBinAbs / nextBinVal;
+
+      // check bins
+      const Bool_t areBinsNonzero = ((thisBinVal > 0.) && (nextBinVal > 0.));
+      const Bool_t isInSmoothZone = (thisBinLoc < xIntBegin); 
+      const Bool_t isAboveStart   = (thisBinLoc >= xSmoothBegin);
+      if (!areBinsNonzero || !isAboveStart) continue;
+
+      // check how sys compare
+      const Bool_t prevMoreThanThis = (prevBinErr > thisBinErr);
+      const Bool_t prevMoreThanNext = (prevBinErr > nextBinErr);
+      const Bool_t thisMoreThanBoth = ((thisBinErr > prevBinErr) && (thisBinErr > nextBinErr));
+
+      // if (x < xInterpol) smooth; else, interpolate
+      if (isInSmoothZone) {
+        if (prevMoreThanThis) {
+          const Double_t newThisErr = thisBinVal * prevBinErr;
+          hRatioAvg -> SetBinError(iRatBin, newThisErr);
+        }
+      } else {
+        if (thisMoreThanBoth) {
+          const Double_t newNextErr = nextBinVal * thisBinErr;
+          hRatioAvg -> SetBinError(iRatBin + 1, newNextErr); 
+        } else if (prevMoreThanNext) {
+          const Double_t newThisErr = thisBinVal * prevBinErr;
+          const Double_t newNextErr = nextBinVal * prevBinErr;
+          hRatioAvg -> SetBinError(iRatBin, newThisErr);
+          hRatioAvg -> SetBinError(iRatBin + 1, newNextErr);
+        } else if (prevMoreThanThis) {
+          const Double_t errorDiff  = nextBinErr - prevBinErr;
+          const Double_t errorAdj   = errorDiff / 2.;
+          const Double_t thisBinAdj = prevBinErr + errorAdj;
+          const Double_t newThisErr = thisBinVal * thisBinAdj;
+          hRatioAvg -> SetBinError(iRatBin, newThisErr);
+        }
+      }  // end smoothing/interpolating
+    }  // end average bin loop
+    cout << "    Smoothed averages." << endl;
+  }  // end average smoothing
 
   // create uncertainty bands on unity
   TH1D *hUnitySys    = (TH1D*) hParticleSys  -> Clone();
