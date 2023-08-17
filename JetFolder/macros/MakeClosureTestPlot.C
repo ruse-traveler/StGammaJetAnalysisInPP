@@ -55,19 +55,19 @@ void MakeClosureTestPlot() {
   cout << "\n  Plotting closure test..." << endl;
 
   // io particle parameters
-  const TString sOut("closureTestFF.withErrSmooth_noEffSmooth_withResSmooth_pTbinHuge.et911r05pi0.d15m8y2023.root");
-  const TString sInSys("et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
-  const TString sInStat("et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
+  const TString sOut("closureTestFF.withErrSmoothAndSmoothError_noEffSmoothWithFix_pTbinHuge.et911r05pi0.d16m8y2023.root");
+  const TString sInSys("closure/et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
+  const TString sInStat("closure/et911r05ff_noEffSmoothWithResSmooth/summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
   const TString sHistSys("hPlotSysUnfoldSmooth");
   const TString sHistStat("hStatistics");
 
   // io variation parameters
   const TString sInVar[NVars] = {
-    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.default_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k3n46t4.root",
-    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysM1_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k2n46t4.root",
-    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysP1_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k4n46t4.root",
-    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forDefLevySys_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n46t4.root",
-    "et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forAltLevySys_noEffSmooth_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n61t5.root"
+    "closure/et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.default_noEffSmoothWithFix_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k3n46t4.root",
+    "closure/et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysM1_noEffSmoothWithFix_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k2n46t4.root",
+    "closure/et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forRegSysP1_noEffSmoothWithFix_withResSmooth_pTbinHuge.et911r05qt05130.p0m1k4n46t4.root",
+    "closure/et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forDefLevySys_noEffSmoothWithFix_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n46t4.root",
+    "closure/et911r05ff_noEffSmoothWithResSmooth/pp200r9ff.forAltLevySys_noEffSmoothWithFix_withResSmooth_pTbinHuge.et911r05qt05130.p1m1k3n61t5.root"
   };
   const TString sHistVar[NVars] = {"hUnfolded", "hUnfolded", "hUnfolded", "hUnfolded", "hUnfolded"};
 
@@ -122,6 +122,13 @@ void MakeClosureTestPlot() {
   const Bool_t  doAvgSmooth(true);
   const Float_t xSmoothBegin(3.);
   const Float_t xInterpol[NTrgs] = {15., 15., 15., 4., 6., 11.};
+
+  // smooth error parameters
+  const Bool_t  addSmoothError(true);
+  const Float_t xAddErrStart(0.);
+  const Float_t xAddErrStop(5.);
+  const TString sInSmoothErr("closure/et911r05ff_noEffSmoothWithResSmooth/histRatios.withVsNoEffSmooth_bothWithErrSmooth.et911r05pi0.d16m8y2023.root");
+  const TString sHistSmoothErr("hVariationSubtract");
 
   // define color schemes
   const UInt_t fColSy[NTrgs]       = {593, 425, 409, 625, 609, 593};
@@ -461,6 +468,77 @@ void MakeClosureTestPlot() {
     }  // end average bin loop
     cout << "    Smoothed averages." << endl;
   }  // end average smoothing
+
+  // add smoothing errors
+  if (addSmoothError) {
+
+    // open file with histogram for error calculation
+    TFile *fSmoothErr = new TFile(sInSmoothErr.Data(), "read");
+    if (!fSmoothErr) {
+      cerr << "PANIC: couldn't open file with smoothing errors!" << endl;
+      return;
+    }
+
+    // grab histogram with errors
+    TH1D *hSmoothErr = (TH1D*) fSmoothErr -> Get(sHistSmoothErr.Data());
+    if (!hSmoothErr) {
+      cerr << "PANIC: couldn't grab smoothing error histogram!" << endl;
+      return;
+    }
+
+    // apply errors to average histogram
+    const UInt_t nAvgBins = hAverage -> GetNbinsX();
+    for (UInt_t iAvgBin = 0; iAvgBin < nAvgBins; iAvgBin++) {
+
+       // get bin center and skip if out of range
+      const Double_t binCenter    = hAverage -> GetBinCenter(iAvgBin);
+      const Bool_t   isPastStart  = (binCenter > xAddErrStart);
+      const Bool_t   isBeforeStop = (binCenter < xAddErrStop);
+      if (!isPastStart || !isBeforeStop) continue;
+
+      // get smoothing error
+      const UInt_t   iErrBin   = hSmoothErr -> FindBin(binCenter);
+      const Double_t errBinVal = hSmoothErr -> GetBinContent(iErrBin);
+      const Double_t smoothErr = TMath::Abs(errBinVal - 1.);
+
+      // add to average band
+      const Double_t avgBinVal = hAverage -> GetBinContent(iAvgBin);
+      const Double_t avgBinErr = hAverage -> GetBinError(iAvgBin);
+      const Double_t avgBinPer = avgBinErr / avgBinVal;
+      const Double_t newBinPer = TMath::Sqrt((avgBinPer * avgBinPer) + (smoothErr * smoothErr));
+      const Double_t newBinErr = avgBinVal * newBinPer;
+      if (avgBinVal > 0.) {
+        hAverage -> SetBinError(iAvgBin, newBinErr);
+      }
+    }  // end average bin loop
+
+    // apply errors to average histogram
+    const UInt_t nRatBins = hRatioAvg -> GetNbinsX();
+    for (UInt_t iRatBin = 0; iRatBin < nRatBins; iRatBin++) {
+
+       // get bin center and skip if out of range
+      const Double_t binCenter    = hRatioAvg -> GetBinCenter(iRatBin);
+      const Bool_t   isPastStart  = (binCenter > xAddErrStart);
+      const Bool_t   isBeforeStop = (binCenter < xAddErrStop);
+      if (!isPastStart || !isBeforeStop) continue;
+
+      // get smoothing error
+      const UInt_t   iErrBin   = hSmoothErr -> FindBin(binCenter);
+      const Double_t errBinVal = hSmoothErr -> GetBinContent(iErrBin);
+      const Double_t smoothErr = TMath::Abs(errBinVal - 1.);
+
+      // add to average band
+      const Double_t ratBinVal = hRatioAvg -> GetBinContent(iRatBin);
+      const Double_t ratBinErr = hRatioAvg -> GetBinError(iRatBin);
+      const Double_t ratBinPer = ratBinErr / ratBinVal;
+      const Double_t newBinPer = TMath::Sqrt((ratBinPer * ratBinPer) + (smoothErr * smoothErr));
+      const Double_t newBinErr = ratBinVal * newBinPer;
+      if (ratBinVal > 0.) {
+        hRatioAvg -> SetBinError(iRatBin, newBinErr);
+      }
+    }  // end average ratio bin loop
+    cout << "    Added smoothing errors." << endl;
+  }
 
   // create uncertainty bands on unity
   TH1D *hUnitySys    = (TH1D*) hParticleSys  -> Clone();

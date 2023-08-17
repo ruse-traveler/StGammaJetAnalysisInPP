@@ -45,8 +45,8 @@ void MakeClosureTestPlotForPaper() {
   cout << "\n  Plotting closure test for paper..." << endl;
 
   // io file parameters
-  const TString sIn("closure/et911r05ff_rebinClosure/closureTestFF.forThesis_pTbinHuge.et911r05pi0.d9m2y2022.root");
-  const TString sOut("closureTestForPaper_totErrorOnlyOnUnity.ffWithRff_pTbinHuge.et911r05pi0.d10m7y2023.root");
+  const TString sIn("closureTestFF.withErrSmoothAndSmoothError_noEffSmoothWithFix_pTbinHuge.et911r05pi0.d16m8y2023.root");
+  const TString sOut("closureTestForPaper.withErrSmoothAndSmoothErrs_noEffSmoothWithFix_pTbinHuge.et911r05pi0.d16m8y2023.root");
 
   // io histogram parameters
   const TString sParticle("hParticleWithStat");
@@ -63,7 +63,7 @@ void MakeClosureTestPlotForPaper() {
 
   // style parameters
   const TString sTitleX("p_{T,jet}^{ch} [GeV/#it{c}]");
-  const TString sTitleY("1/N_{trig} dN^{2}_{jets}/(dp_{T,jet}^{reco,ch} d#eta_{jet}) [GeV/#it{c}]^{-1}");
+  const TString sTitleY("1/N_{trig} dN^{2}_{jet}/(dp_{T,jet}^{reco,ch} d#eta_{jet}) [GeV/#it{c}]^{-1}");
   const TString sTitleR("Ratio to PYTHIA");
   const UInt_t  fColPar(635);
   const UInt_t  fColErr(622);
@@ -120,11 +120,12 @@ void MakeClosureTestPlotForPaper() {
   const Bool_t  showPythiaError(false);
   const Bool_t  putDataErrorsOnUnity(true);
   const Bool_t  putDataErrorsOnPythia(false);
-  const UInt_t  fDataset(1);
+  const Bool_t  addSmoothErrors(true);
   const Float_t minJetPt(3.);
   const Float_t maxJetPt(xBinPtRange[1]);
 
   // data points
+  const UInt_t   fDataset(1);
   const Double_t sysData_et911r02[NPoints][NFields] = {
     {0.41991, 1.67912,     0.41991,  0.58009, 0.0727417,   0.0727417},
     {1.41991, 0.565804,    0.41991,  0.58009, 0.0227303,   0.0227303},
@@ -714,7 +715,7 @@ void MakeClosureTestPlotForPaper() {
   pRatio      -> SetFillColor(0);
   pRatio      -> SetBorderMode(0);
   pRatio      -> SetBorderSize(2);
-  pRatio      -> SetLogy(1);
+  pRatio      -> SetLogy(0);
   pRatio      -> SetTicky(1);
   pRatio      -> SetLeftMargin(0.1784615);
   pRatio      -> SetRightMargin(0.01692308);
