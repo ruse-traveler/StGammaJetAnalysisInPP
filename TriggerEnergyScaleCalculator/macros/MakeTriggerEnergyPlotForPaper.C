@@ -34,7 +34,7 @@ void MakeTriggerEnergyPlotForPaper() {
   cout << "\n  Beginning trigger energy plot maker..." << endl;
 
   // io parameters
-  const TString sOutput("triggerEnergyPlotForPaper_withAprGpcComments.et630pi0vsGam.d20m4y2023.root");
+  const TString sOutput("triggerEnergyPlotForPaper_moreAxisSpace_augComments.et630pi0vsGam.d20m8y2023.root");
   const TString sInParG("output/2022/November2022/trigEtComparison.forPaper_withShapeWeights.et650gam.d29m11y2022.root");
   const TString sInParP("FromSaskia/TriggerET_625_Pythia6_Combine_et6_and8.root");
   const TString sHistParG("hEtTrgParAllWeight");
@@ -78,7 +78,7 @@ void MakeTriggerEnergyPlotForPaper() {
   const UInt_t  fMarParG(29);
   const UInt_t  fMarParP(29);
   const UInt_t  fColGam[NGam]     = {799, 899, 859};
-  const UInt_t  fColPi0[NPi0]     = {859, 899};
+  const UInt_t  fColPi0[NPi0]     = {799, 899};
   const UInt_t  fMarGam[NGam]     = {20,  22,  21};
   const UInt_t  fMarPi0[NPi0]     = {20,  22};
   const Float_t yRange[NRange]    = {0.000000007, 3.};
@@ -257,7 +257,7 @@ void MakeTriggerEnergyPlotForPaper() {
   const Float_t fLblX(0.055);
   const Float_t fLblY(0.055);
   const Float_t fOffX(1.4);
-  const Float_t fOffY(1.5);
+  const Float_t fOffY(1.7);
   const Float_t fOffLX(0.005);
   const Float_t fOffLY(0.005);
   const Float_t fOffLblNudge(0.001);

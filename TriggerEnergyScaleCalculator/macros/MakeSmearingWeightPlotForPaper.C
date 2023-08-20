@@ -35,7 +35,7 @@ void MakeSmearingWeightPlotForPaper() {
   cout << "\n  Beginning smearing weight plot maker..." << endl;
 
   // io parameters
-  const TString sOutput("smearingWeightsForPaper_betterTitles_withAprGpcComments.et630pi0vsGam.d20m4y2023.root");
+  const TString sOutput("smearingWeightsForPaper_moreAxisSpace_augComments.et630pi0vsGam.d20m8y2023.root");
   const TString sInGam[NGam]   = {"output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root",
                                   "output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root",
                                   "output/2022/November2022/matrixProjections.forPaper.et650gam.d30m11y2022.root"};
@@ -69,7 +69,7 @@ void MakeSmearingWeightPlotForPaper() {
   const Float_t xGamRange[NRange] = {6., 30.};
   const Float_t xPi0Range[NRange] = {6., 25.};
   const UInt_t  fColGam[NGam]     = {799, 899, 859};
-  const UInt_t  fColPi0[NPi0]     = {859, 899};
+  const UInt_t  fColPi0[NPi0]     = {799, 899};
   const UInt_t  fMarGam[NGam]     = {20,  22,  21};
   const UInt_t  fMarPi0[NPi0]     = {20,  22};
 
@@ -177,7 +177,7 @@ void MakeSmearingWeightPlotForPaper() {
   const Float_t fLblX(0.055);
   const Float_t fLblY(0.055);
   const Float_t fOffX(1.4);
-  const Float_t fOffY(1.5);
+  const Float_t fOffY(1.7);
   const Float_t fOffLX(0.005);
   const Float_t fOffLY(0.005);
   const Float_t fOffLblNudge(0.001);
