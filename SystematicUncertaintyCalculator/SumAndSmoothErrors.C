@@ -34,7 +34,7 @@
 using namespace std;
 
 // global constants
-static const UInt_t  NSys(2);
+static const UInt_t  NSys(4);
 static const UInt_t  NPts(2);
 static const UInt_t  NVtx(4);
 static const UInt_t  NTrgs(6);
@@ -61,18 +61,24 @@ void SumAndSmoothErrors() {
   cout << "\n  Summing errors..." << endl;
 
   // input/output parameters
-  const TString sOut("summedErrorsFF.modStats_forClosureTest_pTbinHuge.et911r05pi0.d26m10y2021.root");
-  const TString sStat("et911r05ff_rebinClosure/pp200r9ff.modifiedStats_parLvlFF_pTbinHuge.et911r05pi0.d4m10y2021.root");
-  const TString sSys[NSys] = {"et911r05pi0_rebinUnfold/unfoldSys.noGamSys_pTbinHuge.et911r05pi0.d7m10y2021.root", "et911r05pi0_rebinUnfold/detectorSys.updatedStyle_pTbinHuge.et911r05pi0.d7m10y2021.root"};
+  const TString sOut("summedErrors.withSmoothAndFragSys_pTbinHuge.et911r05pi0.d20m8y2023.root");
+  const TString sStat("unfolding/et911r02pi0_rebinUnfold/summedErrors.forLongPaper.et911r02pi0.d9m1y2022.root");
+  const TString sSys[NSys] = {
+    "unfolding/et911r02pi0_rebinUnfold/unfoldSys.noGamSys_pTbinHuge.et911r02pi0.d7m10y2021.root",
+    "unfolding/et911r02pi0_rebinUnfold/detectorSys.updatedStyle_pTbinHuge.et911r02pi0.d7m10y2021.root",
+    "closure/et911r05ff_noEffSmoothWithResSmooth/histRatios.withVsNoEffSmooth_bothWithErrSmooth.et911r05pi0.d16m8y2023.root",
+    "output/2022/January2022/smoothedFragSys_withAlgo.et911r05gam.root"
+  };
 
   // input histogram parameters
-  const TString sHistStat("hSimJetOutput");
-  const TString sHistSys[NSys]   = {"hTotal", "hTotal"};
-  const TString sNameSys[NSys]   = {"hSysUnfold", "hSysDet"};
-  const TString sPlotSys[NSys]   = {"hPlotSysUnfold", "hPlotSysDet"};
-  const TString sPlotTot[NSys]   = {"hPlotTotUnfold", "hPlotTotDet"};
-  const TString sLineSys[NSys]   = {"hLineSysUnfold", "hLineSysDet"};
-  const TString sLineTot[NSys]   = {"hLineTotUnfold", "hLineTotDet"};
+  const TString sHistStat("hStatistics");
+  const TString sHistSys[NSys]   = {"hTotal",         "hTotal",      "hVariationSubtract", "hSmoothSys"};
+  const TString sNameSys[NSys]   = {"hSysUnfold",     "hSysDet",     "hSysSmooth",         "hSysFrag"};
+  const TString sPlotSys[NSys]   = {"hPlotSysUnfold", "hPlotSysDet", "hPlotSysSmooth",     "hPlotSysFrag"};
+  const TString sPlotTot[NSys]   = {"hPlotTotUnfold", "hPlotTotDet", "hPlotTotSmooth",     "hPlotTotFrag"};
+  const TString sLineSys[NSys]   = {"hLineSysUnfold", "hLineSysDet", "hLineSysSmooth",     "hLineSysFrag"};
+  const TString sLineTot[NSys]   = {"hLineTotUnfold", "hLineTotDet", "hLineTotSmooth",     "hLineTotFrag"};
+  const Float_t xMaxApply[NSys]  = {100., 100., 3., 5.};
   const Float_t xPlotRange[NPts] = {0., 30.};
 
   // text parameters
@@ -83,20 +89,36 @@ void SumAndSmoothErrors() {
   // histogram parameters
   const TString sTitle("");
   const TString sTitleX("p_{T}^{unfold} [GeV/c]");
-  const TString sTitleY("(1/N^{trg}) d^{3}N^{jet}/d(p_{T}^{unfold} #eta^{jet}) [GeV/c]^{-1}");
+  const TString sTitleY("(1/N^{trg}) d^{2}N^{jet}/d(p_{T}^{unfold} #eta^{jet}) [GeV/c]^{-1}");
   const TString sTitleL("percent uncertainty");
   const TString sMixSuff("Mix");
   const TString sSmoothSuff("Smooth");
   const TString sLabelStat("#sigma_{stat}");
-  const TString sLabelSys[NSys] = {"#sigma_{sys}^{unfold}", "#sigma_{sys}^{unfold} #oplus #sigma_{sys}^{det}"};
-  const TString sLabels[NHist]  = {"only #sigma_{stat}", "only #sigma_{sys}", "total uncertainty [#sigma_{stat} vs. #sigma_{sys}]"};
+  const TString sLabelSys[NSys] = {
+    "#sigma_{sys}^{unfold}",
+    "#sigma_{sys}^{unfold} #oplus #sigma_{sys}^{det}",
+    "#sigma_{sys}^{unfold} #oplus #sigma_{sys}^{det} #oplus #sigma_{sys}^{smooth}",
+    "#sigma_{sys}^{unfold} #oplus #sigma_{sys}^{det} #oplus #sigma_{sys}^{smooth} #oplus #sigma_{sys}^{frag}"
+  };
+  const TString sLabels[NHist]  = {
+    "only #sigma_{stat}",
+    "only #sigma_{sys}",
+    "total uncertainty [#sigma_{stat} vs. #sigma_{sys}]"
+  };
   const Float_t fScales[NHist]  = {1., 10., 100.};
-  const Bool_t  useSmooth[NSys] = {true, false};
+  const Bool_t  useSmooth[NSys] = {true, false, false, false};
 
   // trigger parameters (color schemes and smoothing/interpolation switch)
   const Float_t xInterpol[NTrgs]    = {15., 15., 15., 4., 6., 11.};
   const UInt_t  fColSt[NTrgs]       = {859, 839, 819, 899, 879, 859};
-  const UInt_t  fColSy[NTrgs][NSys] = {{593, 590}, {425, 422}, {409, 406}, {625, 622}, {609, 606}, {593, 590}};
+  const UInt_t  fColSy[NTrgs][NSys] = {
+    {596, 593, 591, 590},
+    {428, 425, 423, 422},
+    {412, 409, 407, 406},
+    {628, 625, 623, 622},
+    {612, 609, 607, 606},
+    {595, 593, 591, 590}
+  };
 
   // open files
   TFile *fOut  = new TFile(sOut.Data(), "recreate");
@@ -521,18 +543,32 @@ void SumAndSmoothErrors() {
 
     // loop over bins
     for (UInt_t iBin = 0; iBin < nBins; iBin++) {
+
+      // break if bin is out of range
       const UInt_t iVal   = iBin + iStart;
       const Bool_t isLast = (iVal > iLast);
       const Bool_t isDone = (iVal > iStop);
       if (isLast || isDone) break;
+
+      // skip bin if above max pt to apply systematic
+      const Double_t centAdd    = hSys[iSys] -> GetBinCenter(iVal);
+      const Bool_t   isAboveMax = (centAdd > xMaxApply[iSys]);
 
       // add uncertainty to total sum
       const Double_t valAddR = hSys[iSys]       -> GetBinContent(iVal);
       const Double_t valAddS = hSysSmooth[iSys] -> GetBinContent(iVal);
       const Double_t sysAddR = hSys[iSys]       -> GetBinError(iVal);
       const Double_t sysAddS = hSysSmooth[iSys] -> GetBinError(iVal);
-      const Double_t perAddR = sysAddR / valAddR;
-      const Double_t perAddS = sysAddS / valAddS;
+
+      // if above max, don't add systematic
+      Double_t perAddR = sysAddR / valAddR;
+      Double_t perAddS = sysAddS / valAddS;
+      if (isAboveMax) {
+        perAddR = 0.;
+        perAddS = 0.;
+      }
+
+      // calculate sum of squares
       if (valAddR > 0.) {
         perSys2R[iBin] += perAddR * perAddR;
         perTot2R[iBin] += perAddR * perAddR;
